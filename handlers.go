@@ -31,7 +31,7 @@ func TodoShow(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	todo := RepoFindTodo(todoId)
-	if todo.Guid > 0 {
+	if todo.Uuid > 0 {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(todo); err != nil {
@@ -46,7 +46,6 @@ func TodoShow(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound, Text: "Not Found"}); err != nil {
 		panic(err)
 	}
-
 }
 
 /*
@@ -75,6 +74,37 @@ func TodoCreate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(t); err != nil {
+		panic(err)
+	}
+}
+
+/*
+Test with this curl command:
+
+curl  -H "Content-Type: application/json" -X "DELETE" http://localhost:8080/todos/<guid>
+
+*/
+func TodoDelete(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	var todoId int
+	var err error
+	if todoId, err = strconv.Atoi(vars["todoId"]); err != nil {
+		panic(err)
+	}
+	todo := RepoDeleteTodo(todoId)
+	if todo.Uuid > 0 {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode("Todo Deleted"); err != nil {
+			panic(err)
+		}
+		return
+	}
+
+	// If we didn't find it, 404
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusNotFound)
+	if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound, Text: "Not Found"}); err != nil {
 		panic(err)
 	}
 }

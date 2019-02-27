@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	//"fmt"
 	"time"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -38,7 +38,7 @@ func RepoFindTodo(id int) Todo {
 	var todo Todo
 	collection := client.Database("testing").Collection("todos")
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	err := collection.FindOne(ctx, Todo{Guid: id}).Decode(&todo)
+	err := collection.FindOne(ctx, Todo{Uuid: id}).Decode(&todo)
 	if err != nil {
 		panic(err)
 	}
@@ -49,21 +49,21 @@ func RepoFindTodo(id int) Todo {
 func RepoCreateTodo(t Todo) Todo {
 	// currentId needs to be a UUID
 	currentId += 1
-	t.Guid = currentId
+	t.Uuid = currentId
 	collection := client.Database("testing").Collection("todos")
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 	collection.InsertOne(ctx, t)
 	return t
 }
 
 
-func RepoDestroyTodo(id int) error {
-	var todos Todos
-	for i, t := range todos {
-		if t.Guid == id {
-			todos = append(todos[:i], todos[i+1:]...)
-			return nil
-		}
+func RepoDeleteTodo(id int) Todo {
+	var todo Todo
+	collection := client.Database("testing").Collection("todos")
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	err := collection.FindOneAndDelete(ctx, Todo{Uuid: id}).Decode(&todo)
+	if err != nil {
+		panic(err)
 	}
-	return fmt.Errorf("Could not find Todo with id of %d to delete", id)
+	return todo
 }
