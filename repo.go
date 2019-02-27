@@ -1,19 +1,24 @@
 package main
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+	"time"
+)
 
 var currentId int
 var todos Todos
 
+
 // Give us some seed data
-func init() {
-	RepoCreateTodo(Todo{Name: "Write presentation"})
-	RepoCreateTodo(Todo{Name: "Host meetup"})
-}
+//func init() {
+	//RepoCreateTodo(Todo{Name: "Write presentation"})
+	//RepoCreateTodo(Todo{Name: "Host meetup"})
+//}
 
 func RepoFindTodo(id int) Todo {
 	for _, t := range todos {
-		if t.Id == id {
+		if t.Guid == id {
 			return t
 		}
 	}
@@ -25,14 +30,18 @@ func RepoFindTodo(id int) Todo {
 func RepoCreateTodo(t Todo) Todo {
 	// currentId needs to be a UUID
 	currentId += 1
-	t.Id = currentId
-	todos = append(todos, t)
+	t.Guid = currentId
+	fmt.Println(client)
+	collection := client.Database("testing").Collection("todos")
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	result, _ := collection.InsertOne(ctx, t)
+	fmt.Println(result)
 	return t
 }
 
 func RepoDestroyTodo(id int) error {
 	for i, t := range todos {
-		if t.Id == id {
+		if t.Guid == id {
 			todos = append(todos[:i], todos[i+1:]...)
 			return nil
 		}

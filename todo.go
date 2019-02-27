@@ -1,12 +1,18 @@
 package main
 
-import "time"
+import (
+	"time"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	//"go.mongodb.org/mongo-driver/bson"
+)
+
 
 type Todo struct {
-	Id        int       `json:"id"`
-	Name      string    `json:"name"`
-	Completed bool      `json:"completed"`
-	Due       time.Time `json:"due"`
+	ID        primitive.ObjectID       `json:"_id,omitempty" bson:"_id,omitempty"`
+	Guid      int                      `json:"guid,omitempty" bson:"guid,omitempty"`
+	Name      string   				   `json:"name,omitempty" bson:"name,omitempty"`
+	Completed bool                     `json:"completed,omitempty" bson:"completed,omitempty"`
+	Due       time.Time                `json:"due,omitempty" bson:"due,omitempty"`
 }
 
 type Todos []Todo

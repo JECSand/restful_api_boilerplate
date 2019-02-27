@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+var client = DatabaseConn()
+
 func main() {
 	router := NewRouter()
 	fmt.Println("Listening on port 8080....")
