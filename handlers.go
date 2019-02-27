@@ -81,7 +81,7 @@ func TodoCreate(w http.ResponseWriter, r *http.Request) {
 /*
 Test with this curl command:
 
-curl  -H "Content-Type: application/json" -X "DELETE" http://localhost:8080/todos/<guid>
+curl  -H "Content-Type: application/json" -X "DELETE" http://localhost:8080/todos/2
 
 */
 func TodoDelete(w http.ResponseWriter, r *http.Request) {
