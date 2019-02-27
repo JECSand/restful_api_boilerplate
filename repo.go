@@ -4,42 +4,61 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 var currentId int
-var todos Todos
 
 
-// Give us some seed data
-//func init() {
-	//RepoCreateTodo(Todo{Name: "Write presentation"})
-	//RepoCreateTodo(Todo{Name: "Host meetup"})
-//}
-
-func RepoFindTodo(id int) Todo {
-	for _, t := range todos {
-		if t.Guid == id {
-			return t
-		}
-	}
-	// return empty Todo if not found
-	return Todo{}
+func init() {
+	RepoCreateTodo(Todo{Name: "Write presentation"})
+	RepoCreateTodo(Todo{Name: "Host meetup"})
 }
 
-//this is bad, I don't think it passes race condtions
+
+func RepoFindTodos() []Todo {
+	var todos []Todo
+	collection := client.Database("testing").Collection("todos")
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	cursor, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		panic(err)
+	}
+	defer cursor.Close(ctx)
+	for cursor.Next(ctx) {
+		var todo Todo
+		cursor.Decode(&todo)
+		todos = append(todos, todo)
+	}
+	return todos
+}
+
+
+func RepoFindTodo(id int) Todo {
+	var todo Todo
+	collection := client.Database("testing").Collection("todos")
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	err := collection.FindOne(ctx, Todo{Guid: id}).Decode(&todo)
+	if err != nil {
+		panic(err)
+	}
+	return todo
+}
+
+
 func RepoCreateTodo(t Todo) Todo {
 	// currentId needs to be a UUID
 	currentId += 1
 	t.Guid = currentId
-	fmt.Println(client)
 	collection := client.Database("testing").Collection("todos")
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	result, _ := collection.InsertOne(ctx, t)
-	fmt.Println(result)
+	collection.InsertOne(ctx, t)
 	return t
 }
 
+
 func RepoDestroyTodo(id int) error {
+	var todos Todos
 	for i, t := range todos {
 		if t.Guid == id {
 			todos = append(todos[:i], todos[i+1:]...)
