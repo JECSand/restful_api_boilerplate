@@ -1,3 +1,9 @@
+/*
+Author: Connor Sanders
+RESTful API Boilerplate v0.0.1
+2/28/2019
+*/
+
 package main
 
 import "net/http"
@@ -19,27 +25,45 @@ var routes = Routes{
 		Index,
 	},
 	Route{
+		"Signup",
+		"POST",
+		"/signup",
+		Signup,
+	},
+	Route{
+		"Signin",
+		"POST",
+		"/signin",
+		Signin,
+	},
+	Route{
+		"Signout",
+		"DELETE",
+		"/signout",
+		Signout,
+	},
+	Route{
 		"TodoIndex",
 		"GET",
 		"/todos",
-		TodoIndex,
+		MemberTokenVerifyMiddleWare(TodoIndex),
 	},
 	Route{
 		"TodoCreate",
 		"POST",
 		"/todos",
-		TodoCreate,
+		MemberTokenVerifyMiddleWare(TodoCreate),
 	},
 	Route{
 		"TodoShow",
 		"GET",
 		"/todos/{todoId}",
-		TodoShow,
+		MemberTokenVerifyMiddleWare(TodoShow),
 	},
 	Route{
 		"TodoDelete",
 		"DELETE",
 		"/todos/{todoId}",
-		TodoDelete,
+		MemberTokenVerifyMiddleWare(TodoDelete),
 	},
 }

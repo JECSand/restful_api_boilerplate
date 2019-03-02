@@ -1,3 +1,9 @@
+/*
+Author: Connor Sanders
+RESTful API Boilerplate v0.0.1
+2/28/2019
+*/
+
 package main
 
 import (
