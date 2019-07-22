@@ -1,0 +1,13 @@
+{
+  "MongoURI": "mongodb+srv://{username}:{password}@{host}/test?retryWrites=true&w=majority",
+  "Secret": "secretstring",
+  "Database": "database_name",
+  "MasterAdminUsername": "MasterAdmin",
+  "MasterAdminEmail": "admin@example.com",
+  "MasterAdminInitialPassword": "abc123xyz890",
+  "DefaultAdminGroup": "MasterSystemAdmins",
+  "DefaultDateTimeLayout": "2006-01-02 15:04:05 -0700 UTC",
+  "HTTPS": "on",
+  "Cert": "file/path/to/cert.pem",
+  "Key": "file/path/to/cert.pem"
+}

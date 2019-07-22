@@ -1,0 +1,15 @@
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.json
+.idea/*
+/pkg
+/app
+/logs
+src/github.com/
+src/golang.org/
+src/go.mongodb.org/

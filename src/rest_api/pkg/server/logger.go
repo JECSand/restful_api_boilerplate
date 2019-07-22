@@ -1,10 +1,12 @@
 /*
 Author: Connor Sanders
-RESTful API Boilerplate v0.0.1
-2/28/2019
+MIT License
+RESTful API Boilerplate
+7/19/2019
 */
 
-package main
+
+package server
 
 import (
 	"log"

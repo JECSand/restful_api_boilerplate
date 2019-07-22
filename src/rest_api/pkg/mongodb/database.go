@@ -1,20 +1,24 @@
 /*
 Author: Connor Sanders
-RESTful API Boilerplate v0.0.1
-2/28/2019
+MIT License
+RESTful API Boilerplate
+7/19/2019
 */
 
-package main
+
+package mongodb
 
 import (
 	"context"
-	"time"
+	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"time"
 )
 
-func DatabaseConn() *mongo.Client {
-	client, err := mongo.NewClient(options.Client().ApplyURI(""))
+
+func DatabaseConn(mongoUri string) (*mongo.Client, error) {
+	client, err := mongo.NewClient(options.Client().ApplyURI(mongoUri))
 	if err != nil {
 		panic(err)
 	}
@@ -22,7 +26,7 @@ func DatabaseConn() *mongo.Client {
 	//defer cancel()
 	err = client.Connect(ctx)
 	if err != nil {
-		panic(err)
+		fmt.Println("Mongodb Connection Error!")
 	}
-	return client
+	return client, err
 }
