@@ -700,7 +700,7 @@ ___
 
    
 #### 3. Modify User Group
-* PATCH - /groups
+* PATCH - /groups/{groupId}
    
 ##### Request
 
