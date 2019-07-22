@@ -89,7 +89,7 @@ func (p *UserService) UpdatePassword(tokenData []string, CurrentPassword string,
 		if err3 != nil {
 			panic(err3)
 		}
-		filter := bson.D{{"_id", curUser.Id}}
+		filter := bson.D{{"uuid", curUser.Uuid}}
 		update := bson.D{{"$set",
 			bson.D{
 				{"password", string(hashedPassword)},

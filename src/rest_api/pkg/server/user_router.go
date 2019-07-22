@@ -68,7 +68,7 @@ func (ur* userRouter) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	if u.Password == "Incorrect" {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(403)
-		if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusForbidden, Text: "Email Taken"}); err != nil {
+		if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusForbidden, Text: "Incorrect Current Password Provided"}); err != nil {
 			panic(err)
 		}
 	} else {
