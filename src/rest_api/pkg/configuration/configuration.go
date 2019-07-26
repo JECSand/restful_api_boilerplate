@@ -14,6 +14,8 @@ import (
 	"os"
 )
 
+
+// Configuration is a struct designed to hold the applications variable configuration settings
 type Configuration struct {
 	MongoURI                       string
 	Secret                         string
@@ -28,9 +30,14 @@ type Configuration struct {
 	Key                            string
 }
 
-func ConfigurationSettings() Configuration {
-	file, _ := os.Open("conf.json")
-	//defer file.Close()
+
+// ConfigurationSettings is a function that reads a json configuration file and outputs a Configuration struct
+func ConfigurationSettings(env string) Configuration {
+	conf_file := "conf.json"
+	if env == "test" {
+		conf_file = "test_conf.json"
+	}
+	file, _ := os.Open(conf_file)
 	decoder := json.NewDecoder(file)
 	configurationSettings := Configuration{}
 	err := decoder.Decode(&configurationSettings)

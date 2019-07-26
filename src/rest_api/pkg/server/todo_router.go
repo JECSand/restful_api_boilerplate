@@ -20,12 +20,14 @@ import (
 	"rest_api/pkg/configuration"
 )
 
+
 type todoRouter struct {
 	todoService         root.TodoService
 	config              configuration.Configuration
 }
 
 
+// NewTodoRouter is a function that initializes a new todoRouter struct
 func NewTodoRouter(t root.TodoService, router *mux.Router, config configuration.Configuration, client *mongo.Client) *mux.Router {
 	todoRouter := todoRouter{t, config}
 	router.HandleFunc("/todos", MemberTokenVerifyMiddleWare(todoRouter.TodosShow, config, client)).Methods("GET")

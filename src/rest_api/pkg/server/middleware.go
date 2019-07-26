@@ -21,9 +21,12 @@ import (
 	"time"
 )
 
+
+// JWTError is a struct that is used to contain a json encoded error message for any JWT related errors
 type JWTError struct {
 	Message string `json:"message"`
 }
+
 
 // Return JSON Error to Requested is Auth is bad
 func respondWithError(w http.ResponseWriter, status int, error JWTError) {
@@ -33,12 +36,33 @@ func respondWithError(w http.ResponseWriter, status int, error JWTError) {
 	}
 }
 
-// Middleware Function to Verify Requester is a Valid Admin
+
+// Check submitted Auth-Token or API-Key with what's in the blacklist collection
+func checkTokenBlacklist(authToken string, config configuration.Configuration, client *mongo.Client) bool {
+	var checkToken root.Blacklist
+	collection := client.Database(config.Database).Collection("blacklists")
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	blacklistErr := collection.FindOne(ctx, bson.M{"auth_token": authToken}).Decode(&checkToken)
+	if blacklistErr != nil {
+		return false
+	}
+	return true
+}
+
+
+// AdminTokenVerifyMiddleWare is used to verify that the requester is a valid admin
 func AdminTokenVerifyMiddleWare(next http.HandlerFunc, config configuration.Configuration, client *mongo.Client) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var MySigningKey = []byte(config.Secret)
 		var errorObject JWTError
 		authToken := r.Header.Get("Auth-Token")
+		blacklistedToken := checkTokenBlacklist(authToken, config, client)
+		if blacklistedToken {
+			errorObject.Message = "Invalid Token"
+			respondWithError(w, http.StatusUnauthorized, errorObject)
+			return
+		}
 		token, err := jwt.Parse(authToken, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("error")
@@ -54,7 +78,8 @@ func AdminTokenVerifyMiddleWare(next http.HandlerFunc, config configuration.Conf
 		userUuid := tokenClaims["uuid"].(string)
 		var checkUser root.User
 		collection := client.Database(config.Database).Collection("users")
-		ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
 		usernameErr := collection.FindOne(ctx, bson.M{"uuid": userUuid}).Decode(&checkUser)
 		if usernameErr != nil {
 			errorObject.Message = "Invalid Token"
@@ -71,12 +96,19 @@ func AdminTokenVerifyMiddleWare(next http.HandlerFunc, config configuration.Conf
 	})
 }
 
-// Middleware Function to Verify Requested is Authenticated
+
+// MemberTokenVerifyMiddleWare is used to verify that a requester is authenticated
 func MemberTokenVerifyMiddleWare(next http.HandlerFunc, config configuration.Configuration, client *mongo.Client) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var MySigningKey = []byte(config.Secret)
 		var errorObject JWTError
 		authToken := r.Header.Get("Auth-Token")
+		blacklistedToken := checkTokenBlacklist(authToken, config, client)
+		if blacklistedToken {
+			errorObject.Message = "Invalid Token"
+			respondWithError(w, http.StatusUnauthorized, errorObject)
+			return
+		}
 		token, err := jwt.Parse(authToken, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("error")
@@ -92,7 +124,8 @@ func MemberTokenVerifyMiddleWare(next http.HandlerFunc, config configuration.Con
 		userUuid := tokenClaims["uuid"].(string)
 		var checkUser root.User
 		collection := client.Database(config.Database).Collection("users")
-		ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
 		usernameErr := collection.FindOne(ctx, bson.M{"uuid": userUuid}).Decode(&checkUser)
 		if usernameErr != nil {
 			errorObject.Message = "Invalid Token"

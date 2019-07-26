@@ -23,6 +23,7 @@ import (
 )
 
 
+// App is a the highest level struct of the rest_api application. Stores the server, client, and config settings.
 type App struct {
 	server  *server.Server
 	client  *mongo.Client
@@ -30,11 +31,15 @@ type App struct {
 }
 
 
-
-func (a *App) Initialize() {
-	a.config = configuration.ConfigurationSettings()
+// Initialize is a function used to initialize a new instantiation of the API Application
+func (a *App) Initialize(env string) {
+	a.config = configuration.ConfigurationSettings(env)
 	var err error
-	a.client, err = mongodb.DatabaseConn(a.config.MongoURI)
+	mongoURI := a.config.MongoURI
+	if env == "test" {
+		mongoURI = "mongodb://127.0.0.1:27017/test"
+	}
+	a.client, err = mongodb.DatabaseConn(mongoURI)
 	if err != nil {
 		log.Fatalln("unable to connect to mongodb")
 	}
@@ -49,7 +54,8 @@ func (a *App) Initialize() {
 		panic(err)
 	}
 	group.Name = a.config.DefaultAdminGroup
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	docCount, _ := a.client.Database(a.config.Database).Collection("groups").CountDocuments(ctx, bson.M{})
 	if docCount == 0 {
 		group.GroupType = "master_admins"
@@ -64,6 +70,9 @@ func (a *App) Initialize() {
 	a.server = server.NewServer(u, g, t, a.config, a.client)
 
 }
+
+
+// Run is a function used to run a previously initialized API Application
 func (a *App) Run() {
 	//defer a.client.Close()
 	a.server.Start()

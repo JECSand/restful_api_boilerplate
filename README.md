@@ -52,7 +52,9 @@ $ vi conf.json
 ___
 ## Running the API
 
-To start the API run the following:
+### Production
+
+To start the API's production build, run the following:
 
 ```bash
 $ sh start.sh
@@ -63,6 +65,26 @@ To stop the API:
 ```bash
 $ sh stop.sh
 ```
+
+### Development
+
+To start the API in development:
+
+```bash
+$ go build ./src/rest_api/cmd/app
+$ ./app
+```
+
+To stop the development API, enter 'ctrl + c'
+
+### Testing
+
+To start the API's testing module, run the following:
+
+```bash
+$ go test ./src/rest_api/cmd/app
+```
+
 ___
 ## API Route Guide
 ### I) Authentication Routes

@@ -9,6 +9,7 @@ RESTful API Boilerplate
 package root
 
 
+// Todo is a root struct that is used to store the json encoded data for/from a mongodb todos doc.
 type Todo struct {
 	Id                string                   `json:"id,omitempty"`
 	Uuid              string                   `json:"uuid,omitempty"`
@@ -22,10 +23,13 @@ type Todo struct {
 	CreationDatetime  string                   `json:"creation_datetime,omitempty"`
 }
 
+
+// TodoService is an interface used to manage the relevant todos doc controllers
 type TodoService interface {
 	TodoCreate(t Todo) Todo
 	TodoFind([]string, string) Todo
 	TodosFind([]string) []Todo
 	TodoDelete([]string, string) Todo
 	TodoUpdate(t Todo) Todo
+	TodoDocInsert(t Todo) Todo
 }

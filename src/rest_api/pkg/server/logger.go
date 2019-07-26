@@ -21,17 +21,20 @@ type loggingResponseWriter struct {
 }
 
 
+// NewLoggingResponseWriter is a function used to write API log data to the console
 func NewLoggingResponseWriter(w http.ResponseWriter) *loggingResponseWriter {
 	return &loggingResponseWriter{w, http.StatusOK}
 }
 
 
+// Writes response headers for API
 func (lrw *loggingResponseWriter) WriteHeader(code int) {
 	lrw.statusCode = code
 	lrw.ResponseWriter.WriteHeader(code)
 }
 
 
+// Logger is a function that is used to manage the API logging process
 func Logger(inner http.Handler, name string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
@@ -46,5 +49,6 @@ func Logger(inner http.Handler, name string) http.Handler {
 			statusCode,
 			time.Since(start),
 		)
+		// Todo: Add functionality Write to a log file here in the /log directory here
 	})
 }

@@ -5,7 +5,7 @@
 *.dylib
 *.test
 *.out
-*.json
+conf.json
 .idea/*
 /pkg
 /app

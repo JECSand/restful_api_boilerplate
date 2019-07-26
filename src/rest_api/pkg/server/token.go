@@ -16,7 +16,7 @@ import (
 )
 
 
-// Create Session JWT Token
+// CreateToken is used to create a new session JWT token
 func CreateToken(user root.User, config configuration.Configuration, exp int64) string {
 	var MySigningKey = []byte(config.Secret)
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -31,7 +31,7 @@ func CreateToken(user root.User, config configuration.Configuration, exp int64) 
 }
 
 
-// Function that can decode a JWT token
+// DecodeJWT is used to decode a JWT token
 func DecodeJWT(curToken string, config configuration.Configuration) []string {
 	var MySigningKey = []byte(config.Secret)
 	// Decode token

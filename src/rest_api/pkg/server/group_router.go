@@ -20,11 +20,13 @@ import (
 	"rest_api/pkg/configuration"
 )
 
+
 type groupRouter struct {
 	groupService       root.GroupService
 }
 
 
+// NewGroupRouter is a function that initializes a new groupRouter struct
 func NewGroupRouter(g root.GroupService, router *mux.Router, config configuration.Configuration, client *mongo.Client) *mux.Router {
 	groupRouter := groupRouter{g}
 	router.HandleFunc("/groups", AdminTokenVerifyMiddleWare(groupRouter.GroupsShow, config, client)).Methods("GET")

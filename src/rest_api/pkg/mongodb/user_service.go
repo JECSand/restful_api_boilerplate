@@ -21,6 +21,7 @@ import (
 )
 
 
+// UserService is used by the app to manage all user related controllers and functionality
 type UserService struct {
 	collection *mongo.Collection
 	config     configuration.Configuration
@@ -28,17 +29,18 @@ type UserService struct {
 }
 
 
-
+// NewUserService is an exported function used to initialize a new UserService struct
 func NewUserService(client *mongo.Client, dbName string, collectionName string, config configuration.Configuration) *UserService {
 	collection := client.Database(dbName).Collection(collectionName)
 	return &UserService {collection, config, client}
 }
 
 
-// Authenticate users signing in
+// AuthenticateUser is used to authenticate users that are signing in
 func (p *UserService) AuthenticateUser(user root.User) root.User {
 	var checkUser = newUserModel(root.User{})
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	usernameErr := p.collection.FindOne(ctx, bson.M{"username": user.Username}).Decode(&checkUser)
 	if usernameErr != nil {
 		fmt.Println("Look up error: ", usernameErr)
@@ -50,14 +52,27 @@ func (p *UserService) AuthenticateUser(user root.User) root.User {
 	err := bcrypt.CompareHashAndPassword(checkPassword, password)
 	if err == nil {
 		return rootUser
-	} else {
-		fmt.Println("password check err: ", err)
-		return root.User{Password: "Incorrect"}
 	}
+	fmt.Println("password check err: ", err)
+	return root.User{Password: "Incorrect"}
 }
 
 
-// Refresh Existing Session JWT Token
+// BlacklistAuthToken is used during signout to add the now invalid auth-token/api key to the blacklist collection
+func (p *UserService) BlacklistAuthToken(authToken string) {
+	var blacklist root.Blacklist
+	blacklist.AuthToken = authToken
+	currentTime := time.Now().UTC()
+	blacklist.LastModified = currentTime.String()
+	blacklist.CreationDatetime = currentTime.String()
+	blacklistModel := newBlacklistModel(blacklist)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	p.client.Database(p.config.Database).Collection("blacklists").InsertOne(ctx, blacklistModel)
+}
+
+
+// RefreshToken is used to refresh an existing & valid JWT token
 func (p *UserService) RefreshToken(tokenData []string) root.User {
 	if tokenData[0] == "" {
 		return root.User{Uuid: ""}
@@ -68,11 +83,12 @@ func (p *UserService) RefreshToken(tokenData []string) root.User {
 }
 
 
-// Update your user's password
+// UpdatePassword is used to update the currently logged in user's password
 func (p *UserService) UpdatePassword(tokenData []string, CurrentPassword string, newPassword string) root.User {
 	userUuid := tokenData[0]
 	var user = newUserModel(root.User{})
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	err := p.collection.FindOne(ctx, bson.M{"uuid": userUuid}).Decode(&user)
 	if err != nil {
 		return root.User{Uuid: "Not Found"}
@@ -109,11 +125,12 @@ func (p *UserService) UpdatePassword(tokenData []string, CurrentPassword string,
 }
 
 
-// Create a new user
+// UserCreate is used to create a new user
 func (p *UserService) UserCreate(user root.User) root.User {
 	var checkUser = newUserModel(root.User{})
 	var checkGroup = newGroupModel(root.Group{})
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	docCount, err := p.collection.CountDocuments(ctx, bson.M{})
 	usernameErr := p.collection.FindOne(ctx, bson.M{"username": user.Username, "groupuuid": user.GroupUuid}).Decode(&checkUser)
 	emailErr := p.collection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&checkUser)
@@ -159,10 +176,11 @@ func (p *UserService) UserCreate(user root.User) root.User {
 }
 
 
-// Delete a User
+// UserDelete is used to delete an user
 func (p *UserService) UserDelete(id string) root.User {
 	var user = newUserModel(root.User{})
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	err := p.collection.FindOneAndDelete(ctx, bson.M{"uuid": id}).Decode(&user)
 	if err != nil {
 		return root.User{}
@@ -171,10 +189,11 @@ func (p *UserService) UserDelete(id string) root.User {
 }
 
 
-// Find Users
+// UsersFind is used to find all user docs
 func (p *UserService) UsersFind() []root.User {
 	var users []root.User
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	cursor, err := p.collection.Find(ctx, bson.M{})
 	if err != nil {
 		panic(err)
@@ -190,10 +209,11 @@ func (p *UserService) UsersFind() []root.User {
 }
 
 
-// Find a User
+// UserFind is used to find a specific user doc
 func (p *UserService) UserFind(id string) root.User {
 	var user = newUserModel(root.User{})
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	err := p.collection.FindOne(ctx, bson.M{"uuid": id}).Decode(&user)
 	if err != nil {
 		return root.User{}
@@ -202,12 +222,13 @@ func (p *UserService) UserFind(id string) root.User {
 }
 
 
-// Update an existing user
+// UserUpdate is used to update an existing user doc
 func (p *UserService) UserUpdate(user root.User) root.User {
 	var curUser = newUserModel(root.User{})
 	var checkUser = newUserModel(root.User{})
 	var checkGroup = newGroupModel(root.Group{})
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	docCount, err := p.collection.CountDocuments(ctx, bson.M{})
 	if err != nil {
 		panic(err)
@@ -232,49 +253,65 @@ func (p *UserService) UserUpdate(user root.User) root.User {
 	}
 	if docCount == 0 {
 		return root.User{Uuid: "Not Found"}
-	} else {
-		filter := bson.D{{"uuid", user.Uuid}}
-		currentTime := time.Now().UTC()
-		if len(user.Password) != 0 {
-			password := []byte(user.Password)
-			hashedPassword, hashErr := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-			if hashErr != nil {
-				panic(hashErr)
-			}
-			update := bson.D{{"$set",
-				bson.D{
-					{"password", string(hashedPassword)},
-					{"username", user.Username},
-					{"email", user.Email},
-					{"role", user.Role},
-					{"groupuuid", user.GroupUuid},
-					{"last_modified", currentTime.String()},
-				},
-			}}
-			_, err := p.collection.UpdateOne(ctx, filter, update)
-			if err != nil {
-				fmt.Println("update err: ", err)
-				panic(err)
-			}
-			user.Password = ""
-			return user
-		} else {
-			update := bson.D{{"$set",
-				bson.D{
-					{"username", user.Username},
-					{"email", user.Email},
-					{"role", user.Role},
-					{"groupuuid", user.GroupUuid},
-					{"last_modified", currentTime.String()},
-				},
-			}}
-			_, err := p.collection.UpdateOne(ctx, filter, update)
-			if err != nil {
-				fmt.Println("update err: ", err)
-				panic(err)
-			}
-			return user
-		}
 	}
-	return root.User{}
+	filter := bson.D{{"uuid", user.Uuid}}
+	currentTime := time.Now().UTC()
+	if len(user.Password) != 0 {
+		password := []byte(user.Password)
+		hashedPassword, hashErr := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
+		if hashErr != nil {
+			panic(hashErr)
+		}
+		update := bson.D{{"$set",
+			bson.D{
+				{"password", string(hashedPassword)},
+				{"username", user.Username},
+				{"email", user.Email},
+				{"role", user.Role},
+				{"groupuuid", user.GroupUuid},
+				{"last_modified", currentTime.String()},
+			},
+		}}
+		_, err := p.collection.UpdateOne(ctx, filter, update)
+		if err != nil {
+			fmt.Println("update err: ", err)
+			panic(err)
+		}
+		user.Password = ""
+		return user
+	}
+	update := bson.D{{"$set",
+		bson.D{
+			{"username", user.Username},
+			{"email", user.Email},
+			{"role", user.Role},
+			{"groupuuid", user.GroupUuid},
+			{"last_modified", currentTime.String()},
+		},
+	}}
+	_, errUp := p.collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		fmt.Println("update err: ", errUp)
+		panic(errUp)
+	}
+	return user
+}
+
+
+// UserDocInsert is used to insert an user doc directly into mongodb for testing purposes
+func (p *UserService) UserDocInsert(user root.User) root.User {
+	password := []byte(user.Password)
+	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+	user.Password = string(hashedPassword)
+	var insertUser = newUserModel(user)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	_, err2 := p.collection.InsertOne(ctx, insertUser)
+	if err2 != nil {
+		fmt.Println("todo doc insertion error: ", err2)
+	}
+	return insertUser.toRootUser()
 }

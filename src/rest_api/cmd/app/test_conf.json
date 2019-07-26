@@ -1,0 +1,13 @@
+{
+  "MongoURI": "mongodb://127.0.0.1:27017/test",
+  "Secret": "secretstring",
+  "Database": "test",
+  "MasterAdminUsername": "MasterAdmin",
+  "MasterAdminEmail": "admin@example.com",
+  "MasterAdminInitialPassword": "123xyzabc",
+  "DefaultAdminGroup": "MasterSystemAdmins",
+  "DefaultDateTimeLayout": "2006-01-02 15:04:05 -0700 UTC",
+  "HTTPS": "on",
+  "Cert": "/home/api_user/certs/ca.crt",
+  "Key": "/home/api_user/certs/ca.key"
+}

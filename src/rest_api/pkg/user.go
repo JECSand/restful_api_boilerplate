@@ -9,6 +9,7 @@ RESTful API Boilerplate
 package root
 
 
+// User is a root struct that is used to store the json encoded data for/from a mongodb user doc.
 type User struct {
 	Id                string                   `json:"id,omitempty"`
 	Uuid              string                   `json:"uuid,omitempty"`
@@ -22,8 +23,10 @@ type User struct {
 }
 
 
+// UserService is an interface used to manage the relevant user doc controllers
 type UserService interface {
 	AuthenticateUser(u User) User
+	BlacklistAuthToken(authToken string)
 	RefreshToken(tokenData []string) User
 	UpdatePassword(tokenData []string, CurrentPassword string, newPassword string) User
 	UserCreate(u User) User
@@ -31,4 +34,5 @@ type UserService interface {
 	UsersFind() []User
 	UserFind(id string) User
 	UserUpdate(u User) User
+	UserDocInsert(u User) User
 }

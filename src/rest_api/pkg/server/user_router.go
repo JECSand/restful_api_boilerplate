@@ -21,7 +21,6 @@ import (
 )
 
 
-
 type userRouter struct {
 	userService   root.UserService
 	groupService  root.GroupService
@@ -29,6 +28,7 @@ type userRouter struct {
 }
 
 
+// NewUserRouter is a function that initializes a new userRouter struct
 func NewUserRouter(u root.UserService, router *mux.Router, o root.GroupService, config configuration.Configuration, client *mongo.Client) *mux.Router {
 	userRouter := userRouter{u,o, config}
 	router.HandleFunc("/auth", userRouter.Signin).Methods("POST")
@@ -73,7 +73,7 @@ func (ur* userRouter) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusAccepted)
 		u.Password = ""
 		if err := json.NewEncoder(w).Encode(u); err != nil {
 			panic(err)
@@ -204,8 +204,9 @@ func (ur* userRouter) GenerateAPIKey(w http.ResponseWriter, r *http.Request) {
 
 // Handler function that ends a users session
 func (ur* userRouter) Signout(w http.ResponseWriter, r *http.Request) {
+	authToken := r.Header.Get("Auth-Token")
+	ur.userService.BlacklistAuthToken(authToken)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Header().Add("Auth-Token", "")
 	w.WriteHeader(http.StatusOK)
 }
 
