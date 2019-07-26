@@ -20,6 +20,13 @@ before_script:
   - go get "github.com/gofrs/uuid"
   - go get "golang.org/x/crypto/bcrypt"
   - mkdir logs
+  - export PATH=$PATH:'$HOME'/go/bin'
+  - export PATH=$PATH:'$HOME'/go/pkg'
+  - export PATH=$PATH:'$HOME'/go/src'
+  - export PATH=$PATH:'$HOME'/JECSand/restful_api_boilerplate/bin'
+  - export PATH=$PATH:'$HOME'/JECSand/restful_api_boilerplate/pkg'
+  - export PATH=$PATH:'$HOME'/JECSand/restful_api_boilerplate/src'
+  - export GOPATH=$HOME'/JECSand/restful_api_boilerplate/'
 
 script:
   - go test ./src/rest_api/cmd/app
