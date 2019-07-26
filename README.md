@@ -2,6 +2,9 @@
 
 A RESTful API Boilerplate written in Go.
 
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/JECSand/restful_api_boilerplate)](https://goreportcard.com/report/github.com/JECSand/restful_api_boilerplate)
+
 * Author(s): John Connor Sanders
 * Current Version: 0.5.0
 * Release Date: 7/19/2019

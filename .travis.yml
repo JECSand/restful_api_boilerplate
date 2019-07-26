@@ -1,0 +1,25 @@
+language: go
+
+go:
+  - "1.10"
+  - "1.11"
+  - "1.12"
+  - tip
+
+services:
+  - mongodb
+
+before_script:
+  - go get "github.com/gorilla/mux"
+  - go get "github.com/gorilla/handlers"
+  - go get "go.mongodb.org/mongo-driver/mongo"
+  - go get "go.mongodb.org/mongo-driver/mongo/options"
+  - go get "go.mongodb.org/mongo-driver/bson"
+  - go get "go.mongodb.org/mongo-driver/bson/primitive"
+  - go get "github.com/dgrijalva/jwt-go"
+  - go get "github.com/gofrs/uuid"
+  - go get "golang.org/x/crypto/bcrypt"
+  - mkdir logs
+
+script:
+  - go test ./src/rest_api/cmd/app
