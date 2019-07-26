@@ -21,7 +21,6 @@ Follow the instructions below to get the Go RESTful API up and running on your L
 
 * An Ubuntu 18+ or CentOS 7+ Operating System
 * MongoDB 4+
-* User setup with NOPASSWD: ALL sudo powers
 
 ### Setup
 
