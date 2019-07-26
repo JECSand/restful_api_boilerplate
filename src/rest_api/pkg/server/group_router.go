@@ -5,7 +5,6 @@ RESTful API Boilerplate
 7/19/2019
 */
 
-
 package server
 
 import (
@@ -20,11 +19,9 @@ import (
 	"rest_api/pkg/configuration"
 )
 
-
 type groupRouter struct {
-	groupService       root.GroupService
+	groupService root.GroupService
 }
-
 
 // NewGroupRouter is a function that initializes a new groupRouter struct
 func NewGroupRouter(g root.GroupService, router *mux.Router, config configuration.Configuration, client *mongo.Client) *mux.Router {
@@ -37,9 +34,8 @@ func NewGroupRouter(g root.GroupService, router *mux.Router, config configuratio
 	return router
 }
 
-
 // Handler to show all groups
-func (gr* groupRouter) ModifyGroup(w http.ResponseWriter, r *http.Request) {
+func (gr *groupRouter) ModifyGroup(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	groupId := vars["groupId"]
 	var group root.Group
@@ -74,9 +70,8 @@ func (gr* groupRouter) ModifyGroup(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Handler to show all groups
-func (gr* groupRouter) GroupsShow(w http.ResponseWriter, r *http.Request) {
+func (gr *groupRouter) GroupsShow(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	groups := gr.groupService.GroupsFind()
@@ -85,9 +80,8 @@ func (gr* groupRouter) GroupsShow(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Handler to show a specific group
-func (gr* groupRouter) GroupShow(w http.ResponseWriter, r *http.Request) {
+func (gr *groupRouter) GroupShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	groupId := vars["groupId"]
 	group := gr.groupService.GroupFind(groupId)
@@ -106,11 +100,10 @@ func (gr* groupRouter) GroupShow(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Handler to create an group
-func (gr* groupRouter) CreateGroup(w http.ResponseWriter, r *http.Request) {
+func (gr *groupRouter) CreateGroup(w http.ResponseWriter, r *http.Request) {
 	var group root.Group
-	group.GroupType= "normal"
+	group.GroupType = "normal"
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		panic(err)
@@ -146,9 +139,8 @@ func (gr* groupRouter) CreateGroup(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Handler to delete an group
-func (gr* groupRouter) DeleteGroup(w http.ResponseWriter, r *http.Request) {
+func (gr *groupRouter) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	groupId := vars["groupId"]
 	group := gr.groupService.GroupDelete(groupId)

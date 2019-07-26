@@ -1,3 +1,10 @@
+/*
+Author: Connor Sanders
+MIT License
+RESTful API Boilerplate
+7/19/2019
+*/
+
 package main
 
 import (
@@ -10,7 +17,6 @@ import (
 	"time"
 )
 
-
 // Execute test an http request
 func executeRequest(ta App, req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
@@ -18,14 +24,12 @@ func executeRequest(ta App, req *http.Request) *httptest.ResponseRecorder {
 	return rr
 }
 
-
 // Check response code returned from a test http request
 func checkResponseCode(t *testing.T, expected, actual int) {
 	if expected != actual {
 		t.Errorf("Expected response code %d. Got %d\n", expected, actual)
 	}
 }
-
 
 // Signin
 func signin(ta App, username string, password string) *httptest.ResponseRecorder {
@@ -35,7 +39,6 @@ func signin(ta App, username string, password string) *httptest.ResponseRecorder
 	response := executeRequest(ta, req)
 	return response
 }
-
 
 // Create a group doc for test setup
 func createTestGroup(ta App, groupType int) root.Group {
@@ -56,7 +59,6 @@ func createTestGroup(ta App, groupType int) root.Group {
 	ta.server.GroupService.GroupDocInsert(group)
 	return group
 }
-
 
 // Create a user doc for test setup
 func createTestUser(ta App, userType int) root.User {
@@ -83,7 +85,6 @@ func createTestUser(ta App, userType int) root.User {
 	ta.server.UserService.UserDocInsert(user)
 	return user
 }
-
 
 // Create a todos doc for test setup
 func createTestTodo(ta App, todoType int) root.Todo {
@@ -113,10 +114,10 @@ func createTestTodo(ta App, todoType int) root.Todo {
 	return todo
 }
 
-
 // Cleanup after a test
 func clean(ta App) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	ta.client.Database("test").Drop(ctx)
 }
+

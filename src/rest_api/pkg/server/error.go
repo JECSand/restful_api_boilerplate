@@ -5,7 +5,6 @@ RESTful API Boilerplate
 7/19/2019
 */
 
-
 package server
 
 type jsonErr struct {

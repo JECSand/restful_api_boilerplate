@@ -5,23 +5,20 @@ RESTful API Boilerplate
 7/19/2019
 */
 
-
 package root
-
 
 // User is a root struct that is used to store the json encoded data for/from a mongodb user doc.
 type User struct {
-	Id                string                   `json:"id,omitempty"`
-	Uuid              string                   `json:"uuid,omitempty"`
-	Username          string   				   `json:"username,omitempty"`
-	Password          string                   `json:"password,omitempty"`
-	Email             string                   `json:"email,omitempty"`
-	Role              string                   `json:"role,omitempty"`
-	GroupUuid         string                   `json:"groupuuid,omitempty"`
-	LastModified      string                   `json:"last_modified,omitempty"`
-	CreationDatetime  string                   `json:"creation_datetime,omitempty"`
+	Id               string `json:"id,omitempty"`
+	Uuid             string `json:"uuid,omitempty"`
+	Username         string `json:"username,omitempty"`
+	Password         string `json:"password,omitempty"`
+	Email            string `json:"email,omitempty"`
+	Role             string `json:"role,omitempty"`
+	GroupUuid        string `json:"groupuuid,omitempty"`
+	LastModified     string `json:"last_modified,omitempty"`
+	CreationDatetime string `json:"creation_datetime,omitempty"`
 }
-
 
 // UserService is an interface used to manage the relevant user doc controllers
 type UserService interface {

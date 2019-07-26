@@ -5,7 +5,6 @@ RESTful API Boilerplate
 7/19/2019
 */
 
-
 package server
 
 import (
@@ -20,12 +19,10 @@ import (
 	"rest_api/pkg/configuration"
 )
 
-
 type todoRouter struct {
-	todoService         root.TodoService
-	config              configuration.Configuration
+	todoService root.TodoService
+	config      configuration.Configuration
 }
-
 
 // NewTodoRouter is a function that initializes a new todoRouter struct
 func NewTodoRouter(t root.TodoService, router *mux.Router, config configuration.Configuration, client *mongo.Client) *mux.Router {
@@ -38,9 +35,8 @@ func NewTodoRouter(t root.TodoService, router *mux.Router, config configuration.
 	return router
 }
 
-
 // Handler function that returns all object file stored
-func (tr* todoRouter) TodoModify(w http.ResponseWriter, r *http.Request) {
+func (tr *todoRouter) TodoModify(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	todoId := vars["todoId"]
 	var todo root.Todo
@@ -75,9 +71,8 @@ func (tr* todoRouter) TodoModify(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Handler function that returns all object file stored
-func (tr* todoRouter) TodosShow(w http.ResponseWriter, r *http.Request) {
+func (tr *todoRouter) TodosShow(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	decodedToken := DecodeJWT(r.Header.Get("Auth-Token"), tr.config)
@@ -87,9 +82,8 @@ func (tr* todoRouter) TodosShow(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Handler function that returns a specific object file
-func (tr* todoRouter) TodoShow(w http.ResponseWriter, r *http.Request) {
+func (tr *todoRouter) TodoShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	todoId := vars["todoId"]
 	decodedToken := DecodeJWT(r.Header.Get("Auth-Token"), tr.config)
@@ -111,9 +105,8 @@ func (tr* todoRouter) TodoShow(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Handler function that creates a new object and stores the file in GridFS Bucket
-func (tr* todoRouter) TodoCreate(w http.ResponseWriter, r *http.Request) {
+func (tr *todoRouter) TodoCreate(w http.ResponseWriter, r *http.Request) {
 	var todo root.Todo
 	decodedToken := DecodeJWT(r.Header.Get("Auth-Token"), tr.config)
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
@@ -146,9 +139,8 @@ func (tr* todoRouter) TodoCreate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Handler function that deletes a file object from the database
-func (tr* todoRouter) TodoDelete(w http.ResponseWriter, r *http.Request) {
+func (tr *todoRouter) TodoDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	todoId := vars["todoId"]
 	decodedToken := DecodeJWT(r.Header.Get("Auth-Token"), tr.config)

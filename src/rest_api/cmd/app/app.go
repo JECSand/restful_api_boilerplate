@@ -5,9 +5,7 @@ RESTful API Boilerplate
 7/19/2019
 */
 
-
 package main
-
 
 import (
 	"context"
@@ -22,14 +20,12 @@ import (
 	"time"
 )
 
-
 // App is a the highest level struct of the rest_api application. Stores the server, client, and config settings.
 type App struct {
-	server  *server.Server
-	client  *mongo.Client
-	config  configuration.Configuration
+	server *server.Server
+	client *mongo.Client
+	config configuration.Configuration
 }
-
 
 // Initialize is a function used to initialize a new instantiation of the API Application
 func (a *App) Initialize(env string) {
@@ -70,7 +66,6 @@ func (a *App) Initialize(env string) {
 	a.server = server.NewServer(u, g, t, a.config, a.client)
 
 }
-
 
 // Run is a function used to run a previously initialized API Application
 func (a *App) Run() {

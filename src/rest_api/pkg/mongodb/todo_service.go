@@ -5,7 +5,6 @@ RESTful API Boilerplate
 7/19/2019
 */
 
-
 package mongodb
 
 import (
@@ -18,7 +17,6 @@ import (
 	"time"
 )
 
-
 // TodoService is used by the app to manage all todos related controllers and functionality
 type TodoService struct {
 	collection *mongo.Collection
@@ -26,13 +24,11 @@ type TodoService struct {
 	client     *mongo.Client
 }
 
-
 // NewTodoService is an exported function used to initialize a new TodoService struct
 func NewTodoService(client *mongo.Client, dbName string, collectionName string, config configuration.Configuration) *TodoService {
 	collection := client.Database(dbName).Collection(collectionName)
-	return &TodoService {collection, config, client}
+	return &TodoService{collection, config, client}
 }
-
 
 // TodosFind is used to Find all todos docs
 func (p *TodoService) TodosFind(decodedToken []string) []root.Todo {
@@ -56,7 +52,6 @@ func (p *TodoService) TodosFind(decodedToken []string) []root.Todo {
 	return todos
 }
 
-
 // TodoFind is used to Find a specific todos doc
 func (p *TodoService) TodoFind(decodedToken []string, id string) root.Todo {
 	var todo = newTodoModel(root.Todo{})
@@ -72,7 +67,6 @@ func (p *TodoService) TodoFind(decodedToken []string, id string) root.Todo {
 	return todo.toRootTodo()
 }
 
-
 // TodoCreate is used to create a new todos doc
 func (p *TodoService) TodoCreate(todo root.Todo) root.Todo {
 	currentTime := time.Now().UTC()
@@ -87,7 +81,6 @@ func (p *TodoService) TodoCreate(todo root.Todo) root.Todo {
 	}
 	return todoModel.toRootTodo()
 }
-
 
 // TodoDelete is used to delete a specified todos doc
 func (p *TodoService) TodoDelete(decodedToken []string, id string) root.Todo {
@@ -107,7 +100,6 @@ func (p *TodoService) TodoDelete(decodedToken []string, id string) root.Todo {
 	return todo.toRootTodo()
 }
 
-
 // TodoUpdate is used to update an existing todos doc
 func (p *TodoService) TodoUpdate(todo root.Todo) root.Todo {
 	var curTodo = newTodoModel(root.Todo{})
@@ -117,11 +109,21 @@ func (p *TodoService) TodoUpdate(todo root.Todo) root.Todo {
 	if todoErr != nil {
 		return root.Todo{Uuid: "Not Found"}
 	}
-	if len(todo.Name) == 0 { todo.Name = curTodo.Name }
-	if len(todo.Due) == 0 { todo.Due = curTodo.Due }
-	if len(todo.Description) == 0 { todo.Description = curTodo.Description }
-	if len(todo.Completed) == 0 { todo.Completed = curTodo.Completed }
-	if len(todo.UserUuid) == 0 { todo.UserUuid = curTodo.UserUuid }
+	if len(todo.Name) == 0 {
+		todo.Name = curTodo.Name
+	}
+	if len(todo.Due) == 0 {
+		todo.Due = curTodo.Due
+	}
+	if len(todo.Description) == 0 {
+		todo.Description = curTodo.Description
+	}
+	if len(todo.Completed) == 0 {
+		todo.Completed = curTodo.Completed
+	}
+	if len(todo.UserUuid) == 0 {
+		todo.UserUuid = curTodo.UserUuid
+	}
 	filter := bson.D{{"uuid", todo.Uuid}}
 	currentTime := time.Now().UTC()
 	update := bson.D{{"$set",
@@ -141,7 +143,6 @@ func (p *TodoService) TodoUpdate(todo root.Todo) root.Todo {
 	}
 	return todo
 }
-
 
 // TodoDocInsert is used to insert a todos doc directly into mongodb for testing purposes
 func (p *TodoService) TodoDocInsert(todo root.Todo) root.Todo {

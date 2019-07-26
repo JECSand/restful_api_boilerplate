@@ -5,7 +5,6 @@ RESTful API Boilerplate
 7/19/2019
 */
 
-
 package server
 
 import (
@@ -21,12 +20,10 @@ import (
 	"time"
 )
 
-
 // JWTError is a struct that is used to contain a json encoded error message for any JWT related errors
 type JWTError struct {
 	Message string `json:"message"`
 }
-
 
 // Return JSON Error to Requested is Auth is bad
 func respondWithError(w http.ResponseWriter, status int, error JWTError) {
@@ -35,7 +32,6 @@ func respondWithError(w http.ResponseWriter, status int, error JWTError) {
 		panic(err)
 	}
 }
-
 
 // Check submitted Auth-Token or API-Key with what's in the blacklist collection
 func checkTokenBlacklist(authToken string, config configuration.Configuration, client *mongo.Client) bool {
@@ -49,7 +45,6 @@ func checkTokenBlacklist(authToken string, config configuration.Configuration, c
 	}
 	return true
 }
-
 
 // AdminTokenVerifyMiddleWare is used to verify that the requester is a valid admin
 func AdminTokenVerifyMiddleWare(next http.HandlerFunc, config configuration.Configuration, client *mongo.Client) http.HandlerFunc {
@@ -95,7 +90,6 @@ func AdminTokenVerifyMiddleWare(next http.HandlerFunc, config configuration.Conf
 		}
 	})
 }
-
 
 // MemberTokenVerifyMiddleWare is used to verify that a requester is authenticated
 func MemberTokenVerifyMiddleWare(next http.HandlerFunc, config configuration.Configuration, client *mongo.Client) http.HandlerFunc {

@@ -5,7 +5,6 @@ RESTful API Boilerplate
 7/19/2019
 */
 
-
 package mongodb
 
 import (
@@ -17,20 +16,17 @@ import (
 	"time"
 )
 
-
 // GroupService is used by the app to manage all group related controllers and functionality
 type GroupService struct {
 	collection *mongo.Collection
 	client     *mongo.Client
 }
 
-
 // NewGroupService is an exported function used to initialize a new GroupService struct
 func NewGroupService(client *mongo.Client, dbName string, collectionName string) *GroupService {
 	collection := client.Database(dbName).Collection(collectionName)
-	return &GroupService {collection, client}
+	return &GroupService{collection, client}
 }
-
 
 // GroupCreate is used to create a new user group
 func (p *GroupService) GroupCreate(group root.Group) root.Group {
@@ -52,7 +48,6 @@ func (p *GroupService) GroupCreate(group root.Group) root.Group {
 	return groupModel.toRootGroup()
 }
 
-
 // GroupsFind is used to find all group docs
 func (p *GroupService) GroupsFind() []root.Group {
 	var groups []root.Group
@@ -71,7 +66,6 @@ func (p *GroupService) GroupsFind() []root.Group {
 	return groups
 }
 
-
 // GroupFind is used to find a specific group doc
 func (p *GroupService) GroupFind(id string) root.Group {
 	var group = newGroupModel(root.Group{})
@@ -84,7 +78,6 @@ func (p *GroupService) GroupFind(id string) root.Group {
 	return group.toRootGroup()
 }
 
-
 // GroupDelete is used to delete a group doc
 func (p *GroupService) GroupDelete(id string) root.Group {
 	var group = newGroupModel(root.Group{})
@@ -96,7 +89,6 @@ func (p *GroupService) GroupDelete(id string) root.Group {
 	}
 	return group.toRootGroup()
 }
-
 
 // GroupUpdate is used to update an existing group
 func (p *GroupService) GroupUpdate(group root.Group) root.Group {
@@ -122,7 +114,6 @@ func (p *GroupService) GroupUpdate(group root.Group) root.Group {
 	}
 	return group
 }
-
 
 // GroupDocInsert is used to insert a group doc directly into mongodb for testing purposes
 func (p *GroupService) GroupDocInsert(group root.Group) root.Group {

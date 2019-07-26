@@ -5,7 +5,6 @@ RESTful API Boilerplate
 7/19/2019
 */
 
-
 package server
 
 import (
@@ -14,7 +13,6 @@ import (
 	"rest_api/pkg"
 	"rest_api/pkg/configuration"
 )
-
 
 // CreateToken is used to create a new session JWT token
 func CreateToken(user root.User, config configuration.Configuration, exp int64) string {
@@ -30,7 +28,6 @@ func CreateToken(user root.User, config configuration.Configuration, exp int64) 
 	return tokenString
 }
 
-
 // DecodeJWT is used to decode a JWT token
 func DecodeJWT(curToken string, config configuration.Configuration) []string {
 	var MySigningKey = []byte(config.Secret)
@@ -42,13 +39,13 @@ func DecodeJWT(curToken string, config configuration.Configuration) []string {
 		return []byte(MySigningKey), nil
 	})
 	if err != nil {
-		return []string{"",""}
+		return []string{"", ""}
 	}
 	// Determine user based on token
 	tokenClaims := token.Claims.(jwt.MapClaims)
 	userUuid := tokenClaims["uuid"].(string)
 	userRole := tokenClaims["role"].(string)
 	groupUuid := tokenClaims["groupuuid"].(string)
-	reSlice := []string{userUuid,userRole,groupUuid}
+	reSlice := []string{userUuid, userRole, groupUuid}
 	return reSlice
 }

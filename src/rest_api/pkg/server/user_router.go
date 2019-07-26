@@ -5,7 +5,6 @@ RESTful API Boilerplate
 7/19/2019
 */
 
-
 package server
 
 import (
@@ -20,17 +19,15 @@ import (
 	"time"
 )
 
-
 type userRouter struct {
-	userService   root.UserService
-	groupService  root.GroupService
-	config        configuration.Configuration
+	userService  root.UserService
+	groupService root.GroupService
+	config       configuration.Configuration
 }
-
 
 // NewUserRouter is a function that initializes a new userRouter struct
 func NewUserRouter(u root.UserService, router *mux.Router, o root.GroupService, config configuration.Configuration, client *mongo.Client) *mux.Router {
-	userRouter := userRouter{u,o, config}
+	userRouter := userRouter{u, o, config}
 	router.HandleFunc("/auth", userRouter.Signin).Methods("POST")
 	router.HandleFunc("/auth", MemberTokenVerifyMiddleWare(userRouter.RefreshSession, config, client)).Methods("GET")
 	router.HandleFunc("/auth", MemberTokenVerifyMiddleWare(userRouter.Signout, config, client)).Methods("DELETE")
@@ -44,9 +41,8 @@ func NewUserRouter(u root.UserService, router *mux.Router, o root.GroupService, 
 	return router
 }
 
-
 // Handler function that manages the user signin process
-func (ur* userRouter) UpdatePassword(w http.ResponseWriter, r *http.Request) {
+func (ur *userRouter) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		panic(err)
@@ -56,8 +52,8 @@ func (ur* userRouter) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	}
 	decodedToken := DecodeJWT(r.Header.Get("Auth-Token"), ur.config)
 	type passwordStruct struct {
-		NewPassword  string  `json:"new_password"`
-		CurrentPassword  string  `json:"current_password"`
+		NewPassword     string `json:"new_password"`
+		CurrentPassword string `json:"current_password"`
 	}
 	var pw passwordStruct
 	err2 := json.Unmarshal(body, &pw)
@@ -81,9 +77,8 @@ func (ur* userRouter) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Handler function that manages the user signin process
-func (ur* userRouter) ModifyUser(w http.ResponseWriter, r *http.Request) {
+func (ur *userRouter) ModifyUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["userId"]
 	var user root.User
@@ -137,9 +132,8 @@ func (ur* userRouter) ModifyUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Handler function that manages the user signin process
-func (ur* userRouter) Signin(w http.ResponseWriter, r *http.Request) {
+func (ur *userRouter) Signin(w http.ResponseWriter, r *http.Request) {
 	var user root.User
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
@@ -175,9 +169,8 @@ func (ur* userRouter) Signin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Handler function that refreshes a users JWT token
-func (ur* userRouter) RefreshSession(w http.ResponseWriter, r *http.Request) {
+func (ur *userRouter) RefreshSession(w http.ResponseWriter, r *http.Request) {
 	authToken := r.Header.Get("Auth-Token")
 	tokenData := DecodeJWT(authToken, ur.config)
 	user := ur.userService.RefreshToken(tokenData)
@@ -188,9 +181,8 @@ func (ur* userRouter) RefreshSession(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-
 // Handler function that generates a 6 month API Key for a given user
-func (ur* userRouter) GenerateAPIKey(w http.ResponseWriter, r *http.Request) {
+func (ur *userRouter) GenerateAPIKey(w http.ResponseWriter, r *http.Request) {
 	authToken := r.Header.Get("Auth-Token")
 	tokenData := DecodeJWT(authToken, ur.config)
 	user := ur.userService.RefreshToken(tokenData)
@@ -201,18 +193,16 @@ func (ur* userRouter) GenerateAPIKey(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-
 // Handler function that ends a users session
-func (ur* userRouter) Signout(w http.ResponseWriter, r *http.Request) {
+func (ur *userRouter) Signout(w http.ResponseWriter, r *http.Request) {
 	authToken := r.Header.Get("Auth-Token")
 	ur.userService.BlacklistAuthToken(authToken)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 }
 
-
 // Handler function that creates a new user
-func (ur* userRouter) CreateUser(w http.ResponseWriter, r *http.Request) {
+func (ur *userRouter) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user root.User
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
@@ -257,9 +247,8 @@ func (ur* userRouter) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Handler that shows a specific user
-func (ur* userRouter) UsersShow(w http.ResponseWriter, r *http.Request) {
+func (ur *userRouter) UsersShow(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	users := ur.userService.UsersFind()
@@ -268,9 +257,8 @@ func (ur* userRouter) UsersShow(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Handler that shows all users
-func (ur* userRouter) UserShow(w http.ResponseWriter, r *http.Request) {
+func (ur *userRouter) UserShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["userId"]
 	user := ur.userService.UserFind(userId)
@@ -290,9 +278,8 @@ func (ur* userRouter) UserShow(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Handler function that deletes a user
-func (ur* userRouter) DeleteUser(w http.ResponseWriter, r *http.Request) {
+func (ur *userRouter) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["userId"]
 	user := ur.userService.UserDelete(userId)

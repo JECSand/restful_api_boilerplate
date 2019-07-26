@@ -5,7 +5,6 @@ RESTful API Boilerplate
 7/19/2019
 */
 
-
 package server
 
 import (
@@ -19,16 +18,14 @@ import (
 	"rest_api/pkg/configuration"
 )
 
-
 // Server is a struct that stores the API Apps high level attributes such as the router, config, and services
 type Server struct {
-	Router             *mux.Router
-	Config             configuration.Configuration
-	UserService        root.UserService
-	GroupService       root.GroupService
-	TodoService        root.TodoService
+	Router       *mux.Router
+	Config       configuration.Configuration
+	UserService  root.UserService
+	GroupService root.GroupService
+	TodoService  root.TodoService
 }
-
 
 // NewServer is a function used to initialize a new Server struct
 func NewServer(u root.UserService, g root.GroupService, t root.TodoService, config configuration.Configuration, client *mongo.Client) *Server {
@@ -39,7 +36,6 @@ func NewServer(u root.UserService, g root.GroupService, t root.TodoService, conf
 	s := Server{Router: router, Config: config, UserService: u, GroupService: g, TodoService: t}
 	return &s
 }
-
 
 // Start starts the initialized server
 func (s *Server) Start() {

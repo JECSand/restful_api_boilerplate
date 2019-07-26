@@ -5,7 +5,6 @@ RESTful API Boilerplate
 7/25/2019
 */
 
-
 package main
 
 import (
@@ -14,9 +13,7 @@ import (
 	"testing"
 )
 
-
 var ta App
-
 
 // Setup Tests
 func setup() {
@@ -24,11 +21,9 @@ func setup() {
 	ta.Initialize("test")
 }
 
-
 /*
 AUTH & USER TESTS
 */
-
 
 // User Signin Test
 func TestSignin(t *testing.T) {
@@ -38,12 +33,11 @@ func TestSignin(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, testResponse.Code)
 }
 
-
 // Create User Test
 func TestCreateUser(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	authResponse := signin(ta, "MasterAdmin", "123xyzabc")
 	authToken := authResponse.Header().Get("Auth-Token")
 	// Create User Test Request
@@ -57,12 +51,11 @@ func TestCreateUser(t *testing.T) {
 	checkResponseCode(t, http.StatusCreated, testResponse.Code)
 }
 
-
 // User Signout Test
 func TestSignout(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	authResponse := signin(ta, "MasterAdmin", "123xyzabc")
 	authToken := authResponse.Header().Get("Auth-Token")
 	// Signout Test
@@ -82,12 +75,11 @@ func TestSignout(t *testing.T) {
 	checkResponseCode(t, http.StatusUnauthorized, testResponse.Code)
 }
 
-
 // Update Password Test
 func TestUpdatePassword(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	createTestUser(ta, 1)
 	authResponse := signin(ta, "test_user", "789test123")
 	authToken := authResponse.Header().Get("Auth-Token")
@@ -115,13 +107,12 @@ func TestUpdatePassword(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, testResponseOKAuth.Code)
 }
 
-
 // Modify User Test
 func TestModifyUser(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
-	createTestGroup(ta,2)
+	createTestGroup(ta, 1)
+	createTestGroup(ta, 2)
 	createTestUser(ta, 1)
 	authResponse := signin(ta, "MasterAdmin", "123xyzabc")
 	authToken := authResponse.Header().Get("Auth-Token")
@@ -139,12 +130,11 @@ func TestModifyUser(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, testResponseOKAuth.Code)
 }
 
-
 // List Users Test
 func TestListUsers(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	createTestUser(ta, 1)
 	createTestUser(ta, 2)
 	authResponse := signin(ta, "MasterAdmin", "123xyzabc")
@@ -159,12 +149,11 @@ func TestListUsers(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, testResponse.Code)
 }
 
-
 // List User Test
 func TestListUser(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	createTestUser(ta, 1)
 	authResponse := signin(ta, "MasterAdmin", "123xyzabc")
 	authToken := authResponse.Header().Get("Auth-Token")
@@ -178,12 +167,11 @@ func TestListUser(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, testResponse.Code)
 }
 
-
 // Delete User Test
 func TestDeleteUser(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	createTestUser(ta, 1)
 	authResponse := signin(ta, "MasterAdmin", "123xyzabc")
 	authToken := authResponse.Header().Get("Auth-Token")
@@ -197,12 +185,11 @@ func TestDeleteUser(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, testResponse.Code)
 }
 
-
 // Refresh Auth Token Test
 func TestTokenRefresh(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	authResponse := signin(ta, "MasterAdmin", "123xyzabc")
 	authToken := authResponse.Header().Get("Auth-Token")
 	// Refresh Auth-Token Test
@@ -223,12 +210,11 @@ func TestTokenRefresh(t *testing.T) {
 	checkResponseCode(t, http.StatusCreated, testResponse.Code)
 }
 
-
 // Generate API Key Test
 func TestGenerateAPIKey(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	authResponse := signin(ta, "MasterAdmin", "123xyzabc")
 	authToken := authResponse.Header().Get("Auth-Token")
 	// Refresh Auth-Token Test
@@ -249,11 +235,9 @@ func TestGenerateAPIKey(t *testing.T) {
 	checkResponseCode(t, http.StatusCreated, testResponse.Code)
 }
 
-
 /*
 GROUP TESTS
 */
-
 
 // Create Group Test
 func TestCreateGroup(t *testing.T) {
@@ -272,12 +256,11 @@ func TestCreateGroup(t *testing.T) {
 	checkResponseCode(t, http.StatusCreated, testResponse.Code)
 }
 
-
 // Modify Group Test
 func TestModifyGroup(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	authResponse := signin(ta, "MasterAdmin", "123xyzabc")
 	authToken := authResponse.Header().Get("Auth-Token")
 	// Modify group test
@@ -291,13 +274,12 @@ func TestModifyGroup(t *testing.T) {
 	checkResponseCode(t, http.StatusAccepted, testResponse.Code)
 }
 
-
 // List Groups Test
 func TestListGroups(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
-	createTestGroup(ta,2)
+	createTestGroup(ta, 1)
+	createTestGroup(ta, 2)
 	authResponse := signin(ta, "MasterAdmin", "123xyzabc")
 	authToken := authResponse.Header().Get("Auth-Token")
 	// List all groups test
@@ -310,12 +292,11 @@ func TestListGroups(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, testResponse.Code)
 }
 
-
 // List Group Test
 func TestListGroup(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	authResponse := signin(ta, "MasterAdmin", "123xyzabc")
 	authToken := authResponse.Header().Get("Auth-Token")
 	// List all groups test
@@ -328,12 +309,11 @@ func TestListGroup(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, testResponse.Code)
 }
 
-
 // Delete Group Test
 func TestDeleteGroup(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	authResponse := signin(ta, "MasterAdmin", "123xyzabc")
 	authToken := authResponse.Header().Get("Auth-Token")
 	// List all groups test
@@ -346,11 +326,9 @@ func TestDeleteGroup(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, testResponse.Code)
 }
 
-
 /*
 TODOS TESTS
 */
-
 
 // Create Todos Test
 func TestCreateTodo(t *testing.T) {
@@ -369,12 +347,11 @@ func TestCreateTodo(t *testing.T) {
 	checkResponseCode(t, http.StatusCreated, testResponse.Code)
 }
 
-
 // Modify Todos Test
 func TestModifyTodo(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	createTestUser(ta, 1)
 	createTestTodo(ta, 1)
 	authResponse := signin(ta, "test_user", "789test123")
@@ -390,12 +367,11 @@ func TestModifyTodo(t *testing.T) {
 	checkResponseCode(t, http.StatusAccepted, testResponse.Code)
 }
 
-
 // List Todos Test
 func TestListTodos(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	createTestUser(ta, 1)
 	createTestTodo(ta, 1)
 	createTestTodo(ta, 2)
@@ -411,12 +387,11 @@ func TestListTodos(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, testResponse.Code)
 }
 
-
 // List Todos Test
 func TestListTodo(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	createTestUser(ta, 1)
 	createTestTodo(ta, 1)
 	authResponse := signin(ta, "test_user", "789test123")
@@ -431,12 +406,11 @@ func TestListTodo(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, testResponse.Code)
 }
 
-
 // Delete Todos Test
 func TestDeleteTodo(t *testing.T) {
 	// Test Setup
 	setup()
-	createTestGroup(ta,1)
+	createTestGroup(ta, 1)
 	createTestUser(ta, 1)
 	createTestTodo(ta, 1)
 	authResponse := signin(ta, "test_user", "789test123")

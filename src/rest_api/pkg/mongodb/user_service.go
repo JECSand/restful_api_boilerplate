@@ -5,7 +5,6 @@ RESTful API Boilerplate
 7/19/2019
 */
 
-
 package mongodb
 
 import (
@@ -20,7 +19,6 @@ import (
 	"time"
 )
 
-
 // UserService is used by the app to manage all user related controllers and functionality
 type UserService struct {
 	collection *mongo.Collection
@@ -28,13 +26,11 @@ type UserService struct {
 	client     *mongo.Client
 }
 
-
 // NewUserService is an exported function used to initialize a new UserService struct
 func NewUserService(client *mongo.Client, dbName string, collectionName string, config configuration.Configuration) *UserService {
 	collection := client.Database(dbName).Collection(collectionName)
-	return &UserService {collection, config, client}
+	return &UserService{collection, config, client}
 }
-
 
 // AuthenticateUser is used to authenticate users that are signing in
 func (p *UserService) AuthenticateUser(user root.User) root.User {
@@ -57,7 +53,6 @@ func (p *UserService) AuthenticateUser(user root.User) root.User {
 	return root.User{Password: "Incorrect"}
 }
 
-
 // BlacklistAuthToken is used during signout to add the now invalid auth-token/api key to the blacklist collection
 func (p *UserService) BlacklistAuthToken(authToken string) {
 	var blacklist root.Blacklist
@@ -71,7 +66,6 @@ func (p *UserService) BlacklistAuthToken(authToken string) {
 	p.client.Database(p.config.Database).Collection("blacklists").InsertOne(ctx, blacklistModel)
 }
 
-
 // RefreshToken is used to refresh an existing & valid JWT token
 func (p *UserService) RefreshToken(tokenData []string) root.User {
 	if tokenData[0] == "" {
@@ -81,7 +75,6 @@ func (p *UserService) RefreshToken(tokenData []string) root.User {
 	user := p.UserFind(userUuid)
 	return user
 }
-
 
 // UpdatePassword is used to update the currently logged in user's password
 func (p *UserService) UpdatePassword(tokenData []string, CurrentPassword string, newPassword string) root.User {
@@ -118,12 +111,9 @@ func (p *UserService) UpdatePassword(tokenData []string, CurrentPassword string,
 			panic(err4)
 		}
 		return curUser
-	} else {
-		return root.User{Password: "Incorrect"}
 	}
-	return root.User{}
+	return root.User{Password: "Incorrect"}
 }
-
 
 // UserCreate is used to create a new user
 func (p *UserService) UserCreate(user root.User) root.User {
@@ -132,6 +122,9 @@ func (p *UserService) UserCreate(user root.User) root.User {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	docCount, err := p.collection.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		panic(err)
+	}
 	usernameErr := p.collection.FindOne(ctx, bson.M{"username": user.Username, "groupuuid": user.GroupUuid}).Decode(&checkUser)
 	emailErr := p.collection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&checkUser)
 	groupErr := p.client.Database(p.config.Database).Collection("groups").FindOne(ctx, bson.M{"uuid": user.GroupUuid}).Decode(&checkGroup)
@@ -142,15 +135,15 @@ func (p *UserService) UserCreate(user root.User) root.User {
 	} else if groupErr != nil {
 		return root.User{GroupUuid: "No User Group Found"}
 	}
-	curid, err := uuid.NewV4()
-	if err != nil {
-		panic(err)
+	curid, err2 := uuid.NewV4()
+	if err2 != nil {
+		panic(err2)
 	}
 	user.Uuid = curid.String()
 	password := []byte(user.Password)
-	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-	if err != nil {
-		panic(err)
+	hashedPassword, err3 := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
+	if err3 != nil {
+		panic(err3)
 	}
 	user.Password = string(hashedPassword)
 	if docCount == 0 {
@@ -175,7 +168,6 @@ func (p *UserService) UserCreate(user root.User) root.User {
 	return userModel.toRootUser()
 }
 
-
 // UserDelete is used to delete an user
 func (p *UserService) UserDelete(id string) root.User {
 	var user = newUserModel(root.User{})
@@ -187,7 +179,6 @@ func (p *UserService) UserDelete(id string) root.User {
 	}
 	return user.toRootUser()
 }
-
 
 // UsersFind is used to find all user docs
 func (p *UserService) UsersFind() []root.User {
@@ -208,7 +199,6 @@ func (p *UserService) UsersFind() []root.User {
 	return users
 }
 
-
 // UserFind is used to find a specific user doc
 func (p *UserService) UserFind(id string) root.User {
 	var user = newUserModel(root.User{})
@@ -220,7 +210,6 @@ func (p *UserService) UserFind(id string) root.User {
 	}
 	return user.toRootUser()
 }
-
 
 // UserUpdate is used to update an existing user doc
 func (p *UserService) UserUpdate(user root.User) root.User {
@@ -237,10 +226,18 @@ func (p *UserService) UserUpdate(user root.User) root.User {
 	if userErr != nil {
 		return root.User{Uuid: "Not Found"}
 	}
-	if len(user.Username) == 0 { user.Username = curUser.Username }
-	if len(user.Email) == 0 { user.Email = curUser.Email }
-	if len(user.GroupUuid) == 0 { user.GroupUuid = curUser.GroupUuid }
-	if len(user.Role) == 0 { user.Role = curUser.Role }
+	if len(user.Username) == 0 {
+		user.Username = curUser.Username
+	}
+	if len(user.Email) == 0 {
+		user.Email = curUser.Email
+	}
+	if len(user.GroupUuid) == 0 {
+		user.GroupUuid = curUser.GroupUuid
+	}
+	if len(user.Role) == 0 {
+		user.Role = curUser.Role
+	}
 	usernameErr := p.collection.FindOne(ctx, bson.M{"username": user.Username, "groupuuid": user.GroupUuid}).Decode(&checkUser)
 	emailErr := p.collection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&checkUser)
 	groupErr := p.client.Database(p.config.Database).Collection("groups").FindOne(ctx, bson.M{"uuid": user.GroupUuid}).Decode(&checkGroup)
@@ -296,7 +293,6 @@ func (p *UserService) UserUpdate(user root.User) root.User {
 	}
 	return user
 }
-
 
 // UserDocInsert is used to insert an user doc directly into mongodb for testing purposes
 func (p *UserService) UserDocInsert(user root.User) root.User {

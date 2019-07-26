@@ -5,7 +5,6 @@ RESTful API Boilerplate
 7/19/2019
 */
 
-
 package mongodb
 
 import (
@@ -15,7 +14,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
-
 
 // DatabaseConn is a function that takes a mongoUri string and outputs a connected mongo client for the app to use
 func DatabaseConn(mongoUri string) (*mongo.Client, error) {

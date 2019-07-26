@@ -10,7 +10,8 @@ sudo tar -C $HomeDir -xzf go1.10.3.linux-amd64.tar.gz
 
 export PATH=$PATH:$RepoName/bin
 export PATH=$PATH:$RepoName/pkg
-export PATH=$PATH:$RepoName/src
+export PATH=$PATH:$RepoNamls
+e/src
 export GOPATH=$RepoName
 
 echo 'export PATH=$PATH:'$HOME'/go/bin' >> $HomeDir/.bash_profile
