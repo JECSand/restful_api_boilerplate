@@ -9,15 +9,16 @@ services:
   - mongodb
 
 before_script:
+  - sleep 15
   - go vet ./src/rest_api/cmd/app
 
 install:
-  - export PATH=$PATH:'$HOME'/go/bin'
-  - export PATH=$PATH:'$HOME'/go/pkg'
-  - export PATH=$PATH:'$HOME'/go/src'
-  - export PATH=$PATH:'$HOME'/JECSand/restful_api_boilerplate/bin'
-  - export PATH=$PATH:'$HOME'/JECSand/restful_api_boilerplate/pkg'
-  - export PATH=$PATH:'$HOME'/JECSand/restful_api_boilerplate/src'
+  - export PATH=$PATH:$HOME'/go/bin'
+  - export PATH=$PATH:$HOME'/go/pkg'
+  - export PATH=$PATH:$HOME'/go/src'
+  - export PATH=$PATH:$HOME'/JECSand/restful_api_boilerplate/bin'
+  - export PATH=$PATH:$HOME'/JECSand/restful_api_boilerplate/pkg'
+  - export PATH=$PATH:$HOME'/JECSand/restful_api_boilerplate/src'
   - export GOPATH=$HOME'/JECSand/restful_api_boilerplate/'
   - go get "github.com/gorilla/mux"
   - go get "github.com/gorilla/handlers"
