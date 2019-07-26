@@ -16,10 +16,10 @@ install:
   - export PATH=$PATH:$HOME'/go/bin'
   - export PATH=$PATH:$HOME'/go/pkg'
   - export PATH=$PATH:$HOME'/go/src'
-  - export PATH=$PATH:$HOME'/JECSand/restful_api_boilerplate/bin'
-  - export PATH=$PATH:$HOME'/JECSand/restful_api_boilerplate/pkg'
-  - export PATH=$PATH:$HOME'/JECSand/restful_api_boilerplate/src'
-  - export GOPATH=$HOME'/JECSand/restful_api_boilerplate/'
+  - export PATH=$PATH:$HOME'/github.com/JECSand/restful_api_boilerplate/bin'
+  - export PATH=$PATH:$HOME'/github.com/JECSand/restful_api_boilerplate/pkg'
+  - export PATH=$PATH:$HOME'/github.com/JECSand/restful_api_boilerplate/src'
+  - export GOPATH=$HOME'/github.com/JECSand/restful_api_boilerplate/'
   - go get "github.com/gorilla/mux"
   - go get "github.com/gorilla/handlers"
   - go get "go.mongodb.org/mongo-driver/mongo"
