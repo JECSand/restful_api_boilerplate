@@ -30,7 +30,6 @@ install:
   - go get "github.com/gofrs/uuid"
   - go get "golang.org/x/crypto/bcrypt"
   - mkdir logs
-  - pwd
 
 script:
   - go test ./src/rest_api/cmd/app
