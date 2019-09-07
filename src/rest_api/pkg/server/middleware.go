@@ -27,6 +27,10 @@ type JWTError struct {
 
 // Return JSON Error to Requested is Auth is bad
 func respondWithError(w http.ResponseWriter, status int, error JWTError) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Add("Access-Control-Allow-Headers", "Content-Type, Auth-Token")
+	w.Header().Add("Access-Control-Expose-Headers", "Content-Type, Auth-Token")
+	w.Header().Add("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(status)
 	if err := json.NewEncoder(w).Encode(error); err != nil {
 		panic(err)

@@ -26,7 +26,9 @@ type groupRouter struct {
 // NewGroupRouter is a function that initializes a new groupRouter struct
 func NewGroupRouter(g root.GroupService, router *mux.Router, config configuration.Configuration, client *mongo.Client) *mux.Router {
 	groupRouter := groupRouter{g}
+	router.HandleFunc("/groups", HandleOptionsRequest).Methods("OPTIONS")
 	router.HandleFunc("/groups", AdminTokenVerifyMiddleWare(groupRouter.GroupsShow, config, client)).Methods("GET")
+	router.HandleFunc("/groups/{groupId}", HandleOptionsRequest).Methods("OPTIONS")
 	router.HandleFunc("/groups/{groupId}", AdminTokenVerifyMiddleWare(groupRouter.GroupShow, config, client)).Methods("GET")
 	router.HandleFunc("/groups", AdminTokenVerifyMiddleWare(groupRouter.CreateGroup, config, client)).Methods("POST")
 	router.HandleFunc("/groups/{groupId}", AdminTokenVerifyMiddleWare(groupRouter.DeleteGroup, config, client)).Methods("DELETE")
@@ -47,7 +49,7 @@ func (gr *groupRouter) ModifyGroup(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	if err := json.Unmarshal(body, &group); err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(422)
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			panic(err)
@@ -56,13 +58,13 @@ func (gr *groupRouter) ModifyGroup(w http.ResponseWriter, r *http.Request) {
 	group.Uuid = groupId
 	g := gr.groupService.GroupUpdate(group)
 	if g.Uuid == "Not Found" {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(404)
 		if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound, Text: "Group Not Found"}); err != nil {
 			panic(err)
 		}
 	} else {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(http.StatusAccepted)
 		if err := json.NewEncoder(w).Encode(g); err != nil {
 			panic(err)
@@ -72,7 +74,7 @@ func (gr *groupRouter) ModifyGroup(w http.ResponseWriter, r *http.Request) {
 
 // Handler to show all groups
 func (gr *groupRouter) GroupsShow(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w = SetResponseHeaders(w, "", "")
 	w.WriteHeader(http.StatusOK)
 	groups := gr.groupService.GroupsFind()
 	if err := json.NewEncoder(w).Encode(groups); err != nil {
@@ -86,14 +88,14 @@ func (gr *groupRouter) GroupShow(w http.ResponseWriter, r *http.Request) {
 	groupId := vars["groupId"]
 	group := gr.groupService.GroupFind(groupId)
 	if group.Uuid != "" {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(group); err != nil {
 			panic(err)
 		}
 		return
 	}
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w = SetResponseHeaders(w, "", "")
 	w.WriteHeader(http.StatusNotFound)
 	if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound, Text: "Group Not Found"}); err != nil {
 		panic(err)
@@ -112,7 +114,7 @@ func (gr *groupRouter) CreateGroup(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	if err := json.Unmarshal(body, &group); err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(422)
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			panic(err)
@@ -125,13 +127,13 @@ func (gr *groupRouter) CreateGroup(w http.ResponseWriter, r *http.Request) {
 	group.Uuid = curid.String()
 	g := gr.groupService.GroupCreate(group)
 	if g.Name == "Taken" {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(403)
 		if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusForbidden, Text: "Group Name Taken"}); err != nil {
 			panic(err)
 		}
 	} else {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(http.StatusCreated)
 		if err := json.NewEncoder(w).Encode(g); err != nil {
 			panic(err)
@@ -145,7 +147,7 @@ func (gr *groupRouter) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	groupId := vars["groupId"]
 	group := gr.groupService.GroupDelete(groupId)
 	if group.Uuid != "" {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode("Group Deleted"); err != nil {
 			panic(err)
@@ -153,7 +155,7 @@ func (gr *groupRouter) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// If we didn't find it, 404
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w = SetResponseHeaders(w, "", "")
 	w.WriteHeader(http.StatusNotFound)
 	if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound, Text: "Group Not Found"}); err != nil {
 		panic(err)

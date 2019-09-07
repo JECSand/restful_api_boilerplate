@@ -27,7 +27,9 @@ type todoRouter struct {
 // NewTodoRouter is a function that initializes a new todoRouter struct
 func NewTodoRouter(t root.TodoService, router *mux.Router, config configuration.Configuration, client *mongo.Client) *mux.Router {
 	todoRouter := todoRouter{t, config}
+	router.HandleFunc("/todos", HandleOptionsRequest).Methods("OPTIONS")
 	router.HandleFunc("/todos", MemberTokenVerifyMiddleWare(todoRouter.TodosShow, config, client)).Methods("GET")
+	router.HandleFunc("/todos/{todoId}", HandleOptionsRequest).Methods("OPTIONS")
 	router.HandleFunc("/todos/{todoId}", MemberTokenVerifyMiddleWare(todoRouter.TodoShow, config, client)).Methods("GET")
 	router.HandleFunc("/todos", MemberTokenVerifyMiddleWare(todoRouter.TodoCreate, config, client)).Methods("POST")
 	router.HandleFunc("/todos/{todoId}", MemberTokenVerifyMiddleWare(todoRouter.TodoDelete, config, client)).Methods("DELETE")
@@ -48,7 +50,7 @@ func (tr *todoRouter) TodoModify(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	if err := json.Unmarshal(body, &todo); err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(422)
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			panic(err)
@@ -57,13 +59,13 @@ func (tr *todoRouter) TodoModify(w http.ResponseWriter, r *http.Request) {
 	todo.Uuid = todoId
 	t := tr.todoService.TodoUpdate(todo)
 	if t.Uuid == "Not Found" {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(404)
 		if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound, Text: "Todo Not Found"}); err != nil {
 			panic(err)
 		}
 	} else {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(http.StatusAccepted)
 		if err := json.NewEncoder(w).Encode(t); err != nil {
 			panic(err)
@@ -73,7 +75,7 @@ func (tr *todoRouter) TodoModify(w http.ResponseWriter, r *http.Request) {
 
 // Handler function that returns all object file stored
 func (tr *todoRouter) TodosShow(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w = SetResponseHeaders(w, "", "")
 	w.WriteHeader(http.StatusOK)
 	decodedToken := DecodeJWT(r.Header.Get("Auth-Token"), tr.config)
 	objects := tr.todoService.TodosFind(decodedToken)
@@ -89,7 +91,7 @@ func (tr *todoRouter) TodoShow(w http.ResponseWriter, r *http.Request) {
 	decodedToken := DecodeJWT(r.Header.Get("Auth-Token"), tr.config)
 	todo := tr.todoService.TodoFind(decodedToken, todoId)
 	if todo.Uuid != "" {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(todo); err != nil {
 			panic(err)
@@ -97,7 +99,7 @@ func (tr *todoRouter) TodoShow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// If we didn't find it, 404
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w = SetResponseHeaders(w, "", "")
 	w.WriteHeader(http.StatusNotFound)
 	if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound,
 		Text: "Todo Not Found"}); err != nil {
@@ -117,7 +119,7 @@ func (tr *todoRouter) TodoCreate(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	if err := json.Unmarshal(body, &todo); err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(422)
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			panic(err)
@@ -132,7 +134,7 @@ func (tr *todoRouter) TodoCreate(w http.ResponseWriter, r *http.Request) {
 	todo.UserUuid = decodedToken[0]
 	todo.GroupUuid = decodedToken[2]
 	t := tr.todoService.TodoCreate(todo)
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w = SetResponseHeaders(w, "", "")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(t); err != nil {
 		panic(err)
@@ -146,7 +148,7 @@ func (tr *todoRouter) TodoDelete(w http.ResponseWriter, r *http.Request) {
 	decodedToken := DecodeJWT(r.Header.Get("Auth-Token"), tr.config)
 	todo := tr.todoService.TodoDelete(decodedToken, todoId)
 	if todo.Uuid != "" {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode("File Object Deleted"); err != nil {
 			panic(err)
@@ -154,7 +156,7 @@ func (tr *todoRouter) TodoDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// If we didn't find it, 404
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w = SetResponseHeaders(w, "", "")
 	w.WriteHeader(http.StatusNotFound)
 	if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound, Text: "File Object Not Found"}); err != nil {
 		panic(err)
