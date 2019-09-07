@@ -41,7 +41,7 @@ func TestCreateUser(t *testing.T) {
 	authResponse := signin(ta, "MasterAdmin", "123xyzabc")
 	authToken := authResponse.Header().Get("Auth-Token")
 	// Create User Test Request
-	payload := []byte(`{"username":"test_user","password":"789test123","email":"test@example.com","groupuuid":"96840292-0dd5-44a8-a143-92d949a6be36","role":"member"}`)
+	payload := []byte(`{"username":"test_user","password":"789test123","firstname":"test","lastname":"user","email":"test@example.com","groupuuid":"96840292-0dd5-44a8-a143-92d949a6be36","role":"member"}`)
 	req, _ := http.NewRequest("POST", "/users", bytes.NewBuffer(payload))
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Auth-Token", authToken)
@@ -65,7 +65,7 @@ func TestSignout(t *testing.T) {
 	signoutTestResponse := executeRequest(ta, reqSignout)
 	checkResponseCode(t, http.StatusOK, signoutTestResponse.Code)
 	// Test to ensure the Auth-Token or API-Key is now invalid
-	payload := []byte(`{"username":"test_user","password":"789test123","email":"test@example.com","groupuuid":"96840292-0dd5-44a8-a143-92d949a6be36","role":"member"}`)
+	payload := []byte(`{"username":"test_user","password":"789test123","firstname":"tester","lastname":"userington","email":"test@example.com","groupuuid":"96840292-0dd5-44a8-a143-92d949a6be36","role":"member"}`)
 	req, _ := http.NewRequest("POST", "/users", bytes.NewBuffer(payload))
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Auth-Token", authToken)

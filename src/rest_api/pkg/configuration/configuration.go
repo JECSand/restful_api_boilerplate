@@ -26,6 +26,7 @@ type Configuration struct {
 	HTTPS                      string
 	Cert                       string
 	Key                        string
+	Registration               string
 }
 
 // ConfigurationSettings is a function that reads a json configuration file and outputs a Configuration struct

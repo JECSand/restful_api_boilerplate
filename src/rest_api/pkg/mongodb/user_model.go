@@ -17,6 +17,8 @@ type userModel struct {
 	Uuid             string             `bson:"uuid,omitempty"`
 	Username         string             `bson:"username,omitempty"`
 	Password         string             `bson:"password,omitempty"`
+	FirstName        string             `bson:"firstname,omitempty"`
+	LastName         string             `bson:"lastname,omitempty"`
 	Email            string             `bson:"email,omitempty"`
 	Role             string             `bson:"role,omitempty"`
 	GroupUuid        string             `bson:"groupuuid,omitempty"`
@@ -29,6 +31,8 @@ func newUserModel(u root.User) *userModel {
 		Uuid:             u.Uuid,
 		Username:         u.Username,
 		Password:         u.Password,
+		FirstName:        u.FirstName,
+		LastName:         u.LastName,
 		Email:            u.Email,
 		Role:             u.Role,
 		GroupUuid:        u.GroupUuid,
@@ -43,6 +47,8 @@ func (u *userModel) toRootUser() root.User {
 		Uuid:             u.Uuid,
 		Username:         u.Username,
 		Password:         u.Password,
+		FirstName:        u.FirstName,
+		LastName:         u.LastName,
 		Email:            u.Email,
 		Role:             u.Role,
 		GroupUuid:        u.GroupUuid,

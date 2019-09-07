@@ -9,6 +9,7 @@ package server
 
 import (
 	"encoding/json"
+	"github.com/gofrs/uuid"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/mongo"
 	"io"
@@ -32,6 +33,10 @@ func NewUserRouter(u root.UserService, router *mux.Router, o root.GroupService, 
 	router.HandleFunc("/auth", userRouter.Signin).Methods("POST")
 	router.HandleFunc("/auth", MemberTokenVerifyMiddleWare(userRouter.RefreshSession, config, client)).Methods("GET")
 	router.HandleFunc("/auth", MemberTokenVerifyMiddleWare(userRouter.Signout, config, client)).Methods("DELETE")
+
+	router.HandleFunc("/auth/register", HandleOptionsRequest).Methods("OPTIONS")
+	router.HandleFunc("/auth/register", userRouter.RegisterUser).Methods("POST")
+
 	router.HandleFunc("/auth/api-key", HandleOptionsRequest).Methods("OPTIONS")
 	router.HandleFunc("/auth/api-key", MemberTokenVerifyMiddleWare(userRouter.GenerateAPIKey, config, client)).Methods("GET")
 	router.HandleFunc("/auth/password", HandleOptionsRequest).Methods("OPTIONS")
@@ -125,7 +130,7 @@ func (ur *userRouter) ModifyUser(w http.ResponseWriter, r *http.Request) {
 	} else if u.GroupUuid == "No User Group Found" {
 		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(403)
-		if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound, Text: "Owner Not Found"}); err != nil {
+		if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound, Text: "User Group Not Found"}); err != nil {
 			panic(err)
 		}
 	} else {
@@ -201,6 +206,74 @@ func (ur *userRouter) Signout(w http.ResponseWriter, r *http.Request) {
 	ur.userService.BlacklistAuthToken(authToken)
 	w = SetResponseHeaders(w, "", "")
 	w.WriteHeader(http.StatusOK)
+}
+
+// Handler function that registers a new user
+func (ur *userRouter) RegisterUser(w http.ResponseWriter, r *http.Request) {
+	if ur.config.Registration == "off" {
+		w = SetResponseHeaders(w, "", "")
+		w.WriteHeader(404)
+		if err := json.NewEncoder(w).Encode(jsonErr{Code: 404, Text: "Not Found"}); err != nil {
+			panic(err)
+		}
+	} else {
+		var user root.User
+		body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+		if err != nil {
+			panic(err)
+		}
+		if err := r.Body.Close(); err != nil {
+			panic(err)
+		}
+		if err := json.Unmarshal(body, &user); err != nil {
+			w = SetResponseHeaders(w, "", "")
+			w.WriteHeader(422)
+			if err := json.NewEncoder(w).Encode(err); err != nil {
+				panic(err)
+			}
+		}
+		var group root.Group
+		groupName := user.Username
+		groupName += "_group"
+		group.Name = groupName
+		group.GroupType = "normal"
+		curid, err := uuid.NewV4()
+		if err != nil {
+			panic(err)
+		}
+		group.Uuid = curid.String()
+		g := ur.groupService.GroupCreate(group)
+		if g.Name == "Taken" {
+			w = SetResponseHeaders(w, "", "")
+			w.WriteHeader(403)
+			if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusForbidden, Text: "Username Taken"}); err != nil {
+				panic(err)
+			}
+		}
+		user.Role = "group_admin"
+		user.GroupUuid = g.Uuid
+		u := ur.userService.UserCreate(user)
+		if u.Email == "Taken" {
+			w = SetResponseHeaders(w, "", "")
+			w.WriteHeader(403)
+			if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusForbidden, Text: "Email Taken"}); err != nil {
+				panic(err)
+			}
+		} else if u.Username == "Taken" {
+			w = SetResponseHeaders(w, "", "")
+			w.WriteHeader(403)
+			if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusForbidden, Text: "Username Taken"}); err != nil {
+				panic(err)
+			}
+		} else {
+			w = SetResponseHeaders(w, "", "")
+			w.WriteHeader(http.StatusCreated)
+			u.Password = ""
+			if err := json.NewEncoder(w).Encode(u); err != nil {
+				panic(err)
+			}
+		}
+	}
 }
 
 // Handler function that creates a new user

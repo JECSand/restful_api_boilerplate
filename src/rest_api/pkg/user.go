@@ -13,6 +13,8 @@ type User struct {
 	Uuid             string `json:"uuid,omitempty"`
 	Username         string `json:"username,omitempty"`
 	Password         string `json:"password,omitempty"`
+	FirstName        string `json:"firstname,omitempty"`
+	LastName         string `json:"lastname,omitempty"`
 	Email            string `json:"email,omitempty"`
 	Role             string `json:"role,omitempty"`
 	GroupUuid        string `json:"groupuuid,omitempty"`

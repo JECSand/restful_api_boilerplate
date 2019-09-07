@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-// Handler function that manages OPTIONS request
+// HandleOptionsRequest handles incoming OPTIONS request
 func HandleOptionsRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Add("Access-Control-Allow-Headers", "Content-Type, Auth-Token, API-Key")
@@ -21,7 +21,7 @@ func HandleOptionsRequest(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// Function that handles setting a route's response headers
+// SetResponseHeaders sets the response headers being sent back to the client
 func SetResponseHeaders(w http.ResponseWriter, authToken string, apiKey string) http.ResponseWriter {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Add("Access-Control-Allow-Headers", "Content-Type, Auth-Token, API-Key")

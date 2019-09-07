@@ -60,6 +60,8 @@ func (a *App) Initialize(env string) {
 		adminUser.Username = a.config.MasterAdminUsername
 		adminUser.Email = a.config.MasterAdminEmail
 		adminUser.Password = a.config.MasterAdminInitialPassword
+		adminUser.FirstName = "root"
+		adminUser.LastName = "admin"
 		adminUser.GroupUuid = adminGroup.Uuid
 		u.UserCreate(adminUser)
 	}

@@ -229,6 +229,12 @@ func (p *UserService) UserUpdate(user root.User) root.User {
 	if len(user.Username) == 0 {
 		user.Username = curUser.Username
 	}
+	if len(user.FirstName) == 0 {
+		user.FirstName = curUser.FirstName
+	}
+	if len(user.LastName) == 0 {
+		user.LastName = curUser.LastName
+	}
 	if len(user.Email) == 0 {
 		user.Email = curUser.Email
 	}
@@ -262,6 +268,8 @@ func (p *UserService) UserUpdate(user root.User) root.User {
 		update := bson.D{{"$set",
 			bson.D{
 				{"password", string(hashedPassword)},
+				{"firstname", user.FirstName},
+				{"lastname", user.LastName},
 				{"username", user.Username},
 				{"email", user.Email},
 				{"role", user.Role},
@@ -279,6 +287,8 @@ func (p *UserService) UserUpdate(user root.User) root.User {
 	}
 	update := bson.D{{"$set",
 		bson.D{
+			{"firstname", user.FirstName},
+			{"lastname", user.LastName},
 			{"username", user.Username},
 			{"email", user.Email},
 			{"role", user.Role},

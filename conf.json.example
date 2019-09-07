@@ -9,5 +9,6 @@
   "DefaultDateTimeLayout": "2006-01-02 15:04:05 -0700 UTC",
   "HTTPS": "on",
   "Cert": "file/path/to/cert.pem",
-  "Key": "file/path/to/cert.pem"
+  "Key": "file/path/to/cert.pem",
+  "Registration": "on"
 }

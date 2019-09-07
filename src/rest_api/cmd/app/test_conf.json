@@ -9,5 +9,6 @@
   "DefaultDateTimeLayout": "2006-01-02 15:04:05 -0700 UTC",
   "HTTPS": "on",
   "Cert": "/home/api_user/certs/ca.crt",
-  "Key": "/home/api_user/certs/ca.key"
+  "Key": "/home/api_user/certs/ca.key",
+  "Registration": "on"
 }

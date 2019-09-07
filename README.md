@@ -48,6 +48,7 @@ $ . ./install.sh
 * Whether to run App with HTTPS
 * If HTTPS is on, the cert.pem file
 * If HTTPS is on, the path to the key.pem file
+* Whether you want new users to be able to sign themselves up for accounts
 
 ```bash
 $ cp conf.json.example conf.json
@@ -100,7 +101,7 @@ ___
 ##### Request
 
 ***
-* Header
+* Headers
 
 ```
 {
@@ -108,17 +109,29 @@ ___
 }
 ```
 
+* Body
+```
+{
+  "username": "userName",
+  "password": "userpass"
+}
+```
+
 ##### Response
 
 ***
-* Header
+* Headers
 
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Auth-Token: "",
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH
 }
 ```
 
@@ -127,7 +140,9 @@ ___
 {
   "id": "000000000000000000000000",
   "uuid": "00000000-0000-0000-0000-000000000000",
-  "username": "username",
+  "username": "userName",
+  "firstname": "john",
+  "lastname": "smith",
   "email": "user@example.com",
   "role": "member",
   "groupuuid": "00000000-0000-0000-0000-000000000000",
@@ -136,42 +151,106 @@ ___
 }
 ```
 
-#### 2. Refresh Token
-* GET - /auth
+#### 2. Signup
+* POST - /auth/register
+* This route will return a 404 if the "Registration" setting is set to "off" in the conf.json file.
 
 ##### Request
 
 ***
-* Header
+* Headers
 
 ```
 {
-  Content-Type: application/json,
-  Auth-Token: ""
+  Content-Type: application/json
+}
+```
+
+* Body
+```
+{
+  "firstname": "john",
+  "lastname": "smith",
+  "email": "user@example.com"",
+  "username": "userName",
+  "password": "userpass"
 }
 ```
 
 ##### Response
 
 ***
-* Header
+* Headers
 
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Auth-Token: "",
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
 
-#### 3. Signout
+* Body
+```
+{
+  "id": "000000000000000000000000",
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "username": "userName",
+  "firstname": "john",
+  "lastname": "smith",
+  "email": "user@example.com",
+  "role": "member",
+  "groupuuid": "00000000-0000-0000-0000-000000000000",
+  "last_modified": "2019-06-07 20:17:14.630917778 +0000 UTC",
+  "creation_datetime": "2019-06-07 20:17:14.630917778 +0000 UTC"
+}
+```
+
+#### 3. Refresh Token
+* GET - /auth
+
+##### Request
+
+***
+* Headers
+
+```
+{
+  Content-Type: application/json,
+  Auth-Token: ""
+}
+```
+
+##### Response
+
+***
+* Headers
+
+```
+{
+  Content-Type: application/json; charset=UTF-8,
+  Auth-Token: "",
+  Date: DoW, DD MMM YYYY HH:mm:SS GMT,
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
+}
+```
+
+#### 4. Signout
 * DELETE - /auth
 
 ##### Request
 
 ***
-* Header
+* Headers
 
 ```
 {
@@ -183,23 +262,27 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
 
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH
 }
 ```
 
-#### 4. API Key - Expires after 6 Months
+#### 5. API Key - Expires after 6 Months
 * GET - /auth/api-key
 
 ##### Request
 
 ***
-* Header
+* Headers
 
 ```
 {
@@ -211,7 +294,7 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
 
 ```
 {
@@ -219,17 +302,21 @@ ___
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
   Content-Length: 0,
   Auth-Token: "",
-  API-Key: ""
+  API-Key: "",
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
 
-#### 5. Update Password
+#### 6. Update Password
 * POST - /auth/password
 
 ##### Request
 
 ***
-* Header
+* Headers
 
 ```
 {
@@ -251,13 +338,17 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
 
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
 
@@ -271,7 +362,7 @@ ___
 ##### Request
 
 ***
-* Header
+* Headers
 ```
 {
   Content-Type: application/json,
@@ -282,12 +373,16 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
 
@@ -314,7 +409,7 @@ ___
 ##### Request
 
 ***
-* Header
+* Headers
 
 ```
 {
@@ -336,13 +431,17 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
 
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
 
@@ -368,7 +467,7 @@ ___
 ##### Request
 
 ***
-* Header
+* Headers
 
 ```
 {
@@ -392,13 +491,17 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
 
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
 
@@ -424,7 +527,7 @@ ___
 ##### Request
 
 ***
-* Header
+* Headers
 
 ```
 {
@@ -436,13 +539,17 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
 
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
 
@@ -456,7 +563,7 @@ ___
 ##### Request
 
 ***
-* Header
+* Headers
    
 ```
 {
@@ -468,13 +575,17 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
    
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
    
@@ -485,6 +596,8 @@ ___
     "id": "000000000000000000000000",
     "uuid": "00000000-0000-0000-0000-000000000000",
     "username": "userName",
+    "firstname": "jane",
+    "lastname": "smith",
     "email": "user@example.com",
     "role": "member",
     "groupuuid": "00000000-0000-0000-0000-000000000000",
@@ -501,7 +614,7 @@ ___
 ##### Request
 
 ***
-* Header
+* Headers
    
 ```
 {
@@ -515,6 +628,8 @@ ___
 {
   "username": "userName",
   "password": "userpass",
+  "firstname": "jane",
+  "lastname": "smith",
   "email": "test@email.com",
   "groupuuid": "00000000-0000-0000-0000-000000000000",
   "role": "member"
@@ -524,13 +639,17 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
    
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
    
@@ -540,6 +659,8 @@ ___
   "id": "000000000000000000000000",
   "uuid": "00000000-0000-0000-0000-000000000000",
   "username": "userName",
+  "firstname": "jane",
+  "lastname": "smith",
   "email": "test@email.com",
   "role": "member",
   "groupuuid": "00000000-0000-0000-0000-000000000000",
@@ -554,7 +675,7 @@ ___
 ##### Request
 
 ***
-* Header
+* Headers
    
 ```
 {
@@ -568,6 +689,8 @@ ___
 {
   "username": "newUserName",
   "password": "newUserpass",
+  "firstname": "john",
+  "lastname": "smith",
   "email": "new_test@email.com",
   "groupuuid": "00000000-0000-0000-0000-000000000000",
   "role": "member"
@@ -577,13 +700,17 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
    
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
    
@@ -593,6 +720,8 @@ ___
   "id": "000000000000000000000000",
   "uuid": "00000000-0000-0000-0000-000000000000",
   "username": "newUserName",
+  "firstname": "john",
+  "lastname": "smith",
   "email": "new_test@email.com",
   "role": "member",
   "groupuuid": "00000000-0000-0000-0000-000000000000",
@@ -608,7 +737,7 @@ ___
 ##### Request
 
 ***
-* Header
+* Headers
    
 ```
 {
@@ -620,13 +749,17 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
    
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
    
@@ -640,7 +773,7 @@ ___
 ##### Request
 
 ***
-* Header
+* Headers
   
 ```
 {
@@ -652,13 +785,17 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
    
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
    
@@ -683,7 +820,7 @@ ___
 ##### Request
 
 ***
-* Header
+* Headers
    
 ```
 {
@@ -702,13 +839,17 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
    
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
    
@@ -731,7 +872,7 @@ ___
 ##### Request
 
 ***
-* Header
+* Headers
    
 ```
 {
@@ -750,13 +891,17 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
    
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
    
@@ -778,7 +923,7 @@ ___
 ##### Request
 
 ***
-* Header
+* Headers
    
 ```
 {
@@ -790,12 +935,16 @@ ___
 ##### Response
 
 ***
-* Header
+* Headers
    
 ```
 {
   Content-Type: application/json; charset=UTF-8,
   Date: DoW, DD MMM YYYY HH:mm:SS GMT,
-  Content-Length: 0
+  Content-Length: 0,
+  Access-Control-Allow-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Expose-Headers: Content-Type, Auth-Token, API-Key,
+  Access-Control-Allow-Origin: *,
+  Access-Control-Allow-Methods: GET,DELETE,POST,PATCH  
 }
 ```
