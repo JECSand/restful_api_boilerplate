@@ -226,24 +226,7 @@ func (p *UserService) UserUpdate(user root.User) root.User {
 	if userErr != nil {
 		return root.User{Uuid: "Not Found"}
 	}
-	if len(user.Username) == 0 {
-		user.Username = curUser.Username
-	}
-	if len(user.FirstName) == 0 {
-		user.FirstName = curUser.FirstName
-	}
-	if len(user.LastName) == 0 {
-		user.LastName = curUser.LastName
-	}
-	if len(user.Email) == 0 {
-		user.Email = curUser.Email
-	}
-	if len(user.GroupUuid) == 0 {
-		user.GroupUuid = curUser.GroupUuid
-	}
-	if len(user.Role) == 0 {
-		user.Role = curUser.Role
-	}
+	user = BaseModifyUser(user, curUser)
 	usernameErr := p.collection.FindOne(ctx, bson.M{"username": user.Username, "groupuuid": user.GroupUuid}).Decode(&checkUser)
 	emailErr := p.collection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&checkUser)
 	groupErr := p.client.Database(p.config.Database).Collection("groups").FindOne(ctx, bson.M{"uuid": user.GroupUuid}).Decode(&checkGroup)
