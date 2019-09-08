@@ -107,7 +107,9 @@ func (ur *userRouter) ModifyUser(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 	}
-	u := ur.userService.UserUpdate(user)
+	decodedToken := DecodeJWT(r.Header.Get("Auth-Token"), ur.config)
+	groupUuid := AdminRouteRoleCheck(decodedToken)
+	u := ur.userService.UserUpdate(user, groupUuid)
 	if u.Uuid == "Not Found" {
 		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(404)
@@ -182,7 +184,8 @@ func (ur *userRouter) Signin(w http.ResponseWriter, r *http.Request) {
 func (ur *userRouter) RefreshSession(w http.ResponseWriter, r *http.Request) {
 	authToken := r.Header.Get("Auth-Token")
 	tokenData := DecodeJWT(authToken, ur.config)
-	user := ur.userService.RefreshToken(tokenData)
+	groupUuid := AdminRouteRoleCheck(tokenData)
+	user := ur.userService.RefreshToken(tokenData, groupUuid)
 	expDT := time.Now().Add(time.Hour * 1).Unix()
 	newToken := CreateToken(user, ur.config, expDT)
 	w = SetResponseHeaders(w, newToken, "")
@@ -193,7 +196,8 @@ func (ur *userRouter) RefreshSession(w http.ResponseWriter, r *http.Request) {
 func (ur *userRouter) GenerateAPIKey(w http.ResponseWriter, r *http.Request) {
 	authToken := r.Header.Get("Auth-Token")
 	tokenData := DecodeJWT(authToken, ur.config)
-	user := ur.userService.RefreshToken(tokenData)
+	groupUuid := AdminRouteRoleCheck(tokenData)
+	user := ur.userService.RefreshToken(tokenData, groupUuid)
 	expDT := time.Now().Add(time.Hour * 4380).Unix()
 	apiKey := CreateToken(user, ur.config, expDT)
 	w = SetResponseHeaders(w, "", apiKey)
@@ -293,6 +297,11 @@ func (ur *userRouter) CreateUser(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 	}
+	decodedToken := DecodeJWT(r.Header.Get("Auth-Token"), ur.config)
+	groupUuid := AdminRouteRoleCheck(decodedToken)
+	if groupUuid != "" {
+		user.GroupUuid = groupUuid
+	}
 	u := ur.userService.UserCreate(user)
 	if u.Email == "Taken" {
 		w = SetResponseHeaders(w, "", "")
@@ -324,9 +333,11 @@ func (ur *userRouter) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 // Handler that shows a specific user
 func (ur *userRouter) UsersShow(w http.ResponseWriter, r *http.Request) {
+	decodedToken := DecodeJWT(r.Header.Get("Auth-Token"), ur.config)
+	groupUuid := AdminRouteRoleCheck(decodedToken)
 	w = SetResponseHeaders(w, "", "")
 	w.WriteHeader(http.StatusOK)
-	users := ur.userService.UsersFind()
+	users := ur.userService.UsersFind(groupUuid)
 	if err := json.NewEncoder(w).Encode(users); err != nil {
 		panic(err)
 	}
@@ -336,7 +347,9 @@ func (ur *userRouter) UsersShow(w http.ResponseWriter, r *http.Request) {
 func (ur *userRouter) UserShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["userId"]
-	user := ur.userService.UserFind(userId)
+	decodedToken := DecodeJWT(r.Header.Get("Auth-Token"), ur.config)
+	groupUuid := AdminRouteRoleCheck(decodedToken)
+	user := ur.userService.UserFind(userId, groupUuid)
 	if user.Uuid != "" {
 		user.Password = ""
 		w = SetResponseHeaders(w, "", "")
@@ -357,7 +370,9 @@ func (ur *userRouter) UserShow(w http.ResponseWriter, r *http.Request) {
 func (ur *userRouter) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["userId"]
-	user := ur.userService.UserDelete(userId)
+	decodedToken := DecodeJWT(r.Header.Get("Auth-Token"), ur.config)
+	groupUuid := AdminRouteRoleCheck(decodedToken)
+	user := ur.userService.UserDelete(userId, groupUuid)
 	if user.Uuid != "" {
 		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(http.StatusOK)

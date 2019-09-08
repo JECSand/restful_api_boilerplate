@@ -67,12 +67,12 @@ func (p *UserService) BlacklistAuthToken(authToken string) {
 }
 
 // RefreshToken is used to refresh an existing & valid JWT token
-func (p *UserService) RefreshToken(tokenData []string) root.User {
+func (p *UserService) RefreshToken(tokenData []string, groupUuid string) root.User {
 	if tokenData[0] == "" {
 		return root.User{Uuid: ""}
 	}
 	userUuid := tokenData[0]
-	user := p.UserFind(userUuid)
+	user := p.UserFind(userUuid, groupUuid)
 	return user
 }
 
@@ -149,15 +149,17 @@ func (p *UserService) UserCreate(user root.User) root.User {
 	if docCount == 0 {
 		user.Role = "master_admin"
 	} else {
-		if user.Role != "master_admin" {
+		if user.Role != "master_admin" && user.Role != "group_admin" {
 			user.Role = "member"
 		} else {
-			var masterGroup = newGroupModel(root.Group{})
-			groupErr := p.client.Database(p.config.Database).Collection("groups").FindOne(ctx, bson.M{"name": p.config.DefaultAdminGroup}).Decode(&masterGroup)
-			if groupErr != nil {
-				return root.User{GroupUuid: "No User Group Found"}
+			if user.Role == "master_admin" {
+				var masterGroup = newGroupModel(root.Group{})
+				groupErr := p.client.Database(p.config.Database).Collection("groups").FindOne(ctx, bson.M{"name": p.config.DefaultAdminGroup}).Decode(&masterGroup)
+				if groupErr != nil {
+					return root.User{GroupUuid: "No User Group Found"}
+				}
+				user.GroupUuid = masterGroup.Uuid
 			}
-			user.GroupUuid = masterGroup.Uuid
 		}
 	}
 	currentTime := time.Now().UTC()
@@ -169,11 +171,15 @@ func (p *UserService) UserCreate(user root.User) root.User {
 }
 
 // UserDelete is used to delete an user
-func (p *UserService) UserDelete(id string) root.User {
+func (p *UserService) UserDelete(id string, groupUuid string) root.User {
 	var user = newUserModel(root.User{})
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	err := p.collection.FindOneAndDelete(ctx, bson.M{"uuid": id}).Decode(&user)
+	findFilter := bson.M{"uuid": id}
+	if groupUuid != "" {
+		findFilter = bson.M{"uuid": id, "groupuuid": groupUuid}
+	}
+	err := p.collection.FindOneAndDelete(ctx, findFilter).Decode(&user)
 	if err != nil {
 		return root.User{}
 	}
@@ -181,11 +187,15 @@ func (p *UserService) UserDelete(id string) root.User {
 }
 
 // UsersFind is used to find all user docs
-func (p *UserService) UsersFind() []root.User {
+func (p *UserService) UsersFind(groupUuid string) []root.User {
 	var users []root.User
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	cursor, err := p.collection.Find(ctx, bson.M{})
+	findFilter := bson.M{}
+	if groupUuid != "" {
+		findFilter = bson.M{"groupuuid": groupUuid}
+	}
+	cursor, err := p.collection.Find(ctx, findFilter)
 	if err != nil {
 		panic(err)
 	}
@@ -200,11 +210,15 @@ func (p *UserService) UsersFind() []root.User {
 }
 
 // UserFind is used to find a specific user doc
-func (p *UserService) UserFind(id string) root.User {
+func (p *UserService) UserFind(id string, groupUuid string) root.User {
 	var user = newUserModel(root.User{})
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	err := p.collection.FindOne(ctx, bson.M{"uuid": id}).Decode(&user)
+	findFilter := bson.M{"uuid": id}
+	if groupUuid != "" {
+		findFilter = bson.M{"uuid": id, "groupuuid": groupUuid}
+	}
+	err := p.collection.FindOne(ctx, findFilter).Decode(&user)
 	if err != nil {
 		return root.User{}
 	}
@@ -212,7 +226,7 @@ func (p *UserService) UserFind(id string) root.User {
 }
 
 // UserUpdate is used to update an existing user doc
-func (p *UserService) UserUpdate(user root.User) root.User {
+func (p *UserService) UserUpdate(user root.User, groupUuid string) root.User {
 	var curUser = newUserModel(root.User{})
 	var checkUser = newUserModel(root.User{})
 	var checkGroup = newGroupModel(root.Group{})
@@ -222,7 +236,11 @@ func (p *UserService) UserUpdate(user root.User) root.User {
 	if err != nil {
 		panic(err)
 	}
-	userErr := p.collection.FindOne(ctx, bson.M{"uuid": user.Uuid}).Decode(&curUser)
+	findFilter := bson.M{"uuid": user.Uuid}
+	if groupUuid != "" {
+		findFilter = bson.M{"uuid": user.Uuid, "groupuuid": groupUuid}
+	}
+	userErr := p.collection.FindOne(ctx, findFilter).Decode(&curUser)
 	if userErr != nil {
 		return root.User{Uuid: "Not Found"}
 	}

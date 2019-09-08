@@ -2,7 +2,7 @@
 Author: Connor Sanders
 MIT License
 RESTful API Boilerplate
-9/06/2019
+9/08/2019
 */
 
 package server
@@ -35,4 +35,13 @@ func SetResponseHeaders(w http.ResponseWriter, authToken string, apiKey string) 
 		w.Header().Add("API-Key", apiKey)
 	}
 	return w
+}
+
+// AdminRouteRoleCheck checks admin routes JWT tokens to ensure that a group admin does not break scope
+func AdminRouteRoleCheck(decodedToken []string) string {
+	groupUuid := ""
+	if decodedToken[1] != "master_admin" {
+		groupUuid = decodedToken[2]
+	}
+	return groupUuid
 }

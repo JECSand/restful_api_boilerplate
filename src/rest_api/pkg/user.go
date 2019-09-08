@@ -26,12 +26,12 @@ type User struct {
 type UserService interface {
 	AuthenticateUser(u User) User
 	BlacklistAuthToken(authToken string)
-	RefreshToken(tokenData []string) User
+	RefreshToken(tokenData []string, groupUuid string) User
 	UpdatePassword(tokenData []string, CurrentPassword string, newPassword string) User
 	UserCreate(u User) User
-	UserDelete(id string) User
-	UsersFind() []User
-	UserFind(id string) User
-	UserUpdate(u User) User
+	UserDelete(id string, groupUuid string) User
+	UsersFind(groupUuid string) []User
+	UserFind(id string, groupUuid string) User
+	UserUpdate(u User, groupUuid string) User
 	UserDocInsert(u User) User
 }

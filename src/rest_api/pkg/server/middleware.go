@@ -85,7 +85,7 @@ func AdminTokenVerifyMiddleWare(next http.HandlerFunc, config configuration.Conf
 			respondWithError(w, http.StatusUnauthorized, errorObject)
 			return
 		}
-		if token.Valid && checkUser.Role == "master_admin" {
+		if token.Valid && checkUser.Role == "master_admin" || checkUser.Role == "group_admin" {
 			next.ServeHTTP(w, r)
 		} else {
 			errorObject.Message = "Invalid Token"
