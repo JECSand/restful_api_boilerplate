@@ -318,7 +318,7 @@ func (ur *userRouter) CreateUser(w http.ResponseWriter, r *http.Request) {
 	} else if u.GroupUuid == "No User Group Found" {
 		w = SetResponseHeaders(w, "", "")
 		w.WriteHeader(403)
-		if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusForbidden, Text: "Owner Not Found"}); err != nil {
+		if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusForbidden, Text: "Group Not Found"}); err != nil {
 			panic(err)
 		}
 	} else {

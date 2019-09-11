@@ -248,9 +248,9 @@ func (p *UserService) UserUpdate(user root.User, groupUuid string) root.User {
 	usernameErr := p.collection.FindOne(ctx, bson.M{"username": user.Username, "groupuuid": user.GroupUuid}).Decode(&checkUser)
 	emailErr := p.collection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&checkUser)
 	groupErr := p.client.Database(p.config.Database).Collection("groups").FindOne(ctx, bson.M{"uuid": user.GroupUuid}).Decode(&checkGroup)
-	if usernameErr == nil {
+	if usernameErr == nil && curUser.Username != user.Username {
 		return root.User{Username: "Taken"}
-	} else if emailErr == nil {
+	} else if emailErr == nil && curUser.Email != user.Email {
 		return root.User{Email: "Taken"}
 	} else if groupErr != nil {
 		return root.User{GroupUuid: "No User Group Found"}
