@@ -33,21 +33,19 @@ func NewUserRouter(u root.UserService, router *mux.Router, o root.GroupService, 
 	router.HandleFunc("/auth", userRouter.Signin).Methods("POST")
 	router.HandleFunc("/auth", MemberTokenVerifyMiddleWare(userRouter.RefreshSession, config, client)).Methods("GET")
 	router.HandleFunc("/auth", MemberTokenVerifyMiddleWare(userRouter.Signout, config, client)).Methods("DELETE")
-
 	router.HandleFunc("/auth/register", HandleOptionsRequest).Methods("OPTIONS")
 	router.HandleFunc("/auth/register", userRouter.RegisterUser).Methods("POST")
-
 	router.HandleFunc("/auth/api-key", HandleOptionsRequest).Methods("OPTIONS")
 	router.HandleFunc("/auth/api-key", MemberTokenVerifyMiddleWare(userRouter.GenerateAPIKey, config, client)).Methods("GET")
 	router.HandleFunc("/auth/password", HandleOptionsRequest).Methods("OPTIONS")
 	router.HandleFunc("/auth/password", MemberTokenVerifyMiddleWare(userRouter.UpdatePassword, config, client)).Methods("POST")
 	router.HandleFunc("/users", HandleOptionsRequest).Methods("OPTIONS")
-	router.HandleFunc("/users", AdminTokenVerifyMiddleWare(userRouter.UsersShow, config, client)).Methods("GET")
+	router.HandleFunc("/users", MemberTokenVerifyMiddleWare(userRouter.UsersShow, config, client)).Methods("GET")
 	router.HandleFunc("/users/{userId}", HandleOptionsRequest).Methods("OPTIONS")
-	router.HandleFunc("/users/{userId}", AdminTokenVerifyMiddleWare(userRouter.UserShow, config, client)).Methods("GET")
+	router.HandleFunc("/users/{userId}", MemberTokenVerifyMiddleWare(userRouter.UserShow, config, client)).Methods("GET")
 	router.HandleFunc("/users", AdminTokenVerifyMiddleWare(userRouter.CreateUser, config, client)).Methods("POST")
 	router.HandleFunc("/users/{userId}", AdminTokenVerifyMiddleWare(userRouter.DeleteUser, config, client)).Methods("DELETE")
-	router.HandleFunc("/users/{userId}", AdminTokenVerifyMiddleWare(userRouter.ModifyUser, config, client)).Methods("PATCH")
+	router.HandleFunc("/users/{userId}", MemberTokenVerifyMiddleWare(userRouter.ModifyUser, config, client)).Methods("PATCH")
 	return router
 }
 
